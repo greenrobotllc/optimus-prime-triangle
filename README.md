@@ -247,6 +247,24 @@ statement in the three papers is the Lucas–Lehmer test.  The working label `co
 ("Triboletti–Fable") is attached only to the four QPS identities, the errata, the OEIS candidates and the
 Q = 2 conjecture, and only as a *working name*: mathematical names stick through publication and citation.
 
+## The bridge to Dyson's quasicrystal picture (a demonstration, not a result)
+
+`research/quasicrystal_bridge.py` builds two diffraction patterns from real data and checks each
+against its theory.  For the first 100 000 zeta zeros, `F(u) = Σ cos(γu)` shows a spike of depth
+`−(T/2π)·Λ(n)/√n` at every `u = log n` with `n` a prime power, reproduced to better than 0.2 % for all
+prime powers up to 60: Landau's 1911 theorem, the explicit formula seen as diffraction.  The Fibonacci
+chain with tiles `(φ, 1)` has Bragg peaks exactly at `k = 2π(m + nφ)/√5`, brightest at the Fibonacci
+index pairs.  Both are aperiodic sets with discrete spectrum, which is Dyson's observation; but the zeros
+are not uniformly discrete (their density grows like `log T`), so they fall outside the class of
+one-dimensional Fourier quasicrystals that Kurasov–Sarnak constructed and that was later shown to be
+complete.  That is precisely where the route to the Riemann Hypothesis stops, and the page
+`output/zeta_diffraction.html` shows it.
+
+`research/rank_census.py` is the companion large-scale computation: with GMP it tests, for every known
+Mersenne prime up to `p = 1 398 269`, which small primes divide the Fibonacci rank-of-apparition cofactor
+(no factorisation needed: `q | c` iff `M_p | F_{(M_p−1)/q}`).  Results accumulate in
+`discoveries/rank_of_apparition_census.json`.
+
 ## Research action items
 
 1. **Submit the OEIS candidates** (the legitimate way to put a name on a sequence): `Ψ(1,4,n)`

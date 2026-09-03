@@ -230,3 +230,22 @@ def test_monte_carlo_tests_run_and_give_valid_pvalues():
     assert b["n_3mod4"] == 18 and 0.0 <= b["p_uniform"] <= 1.0 and 0.4 < b["wagstaff_expected_fraction"] < 0.5
     rep = es.format_report(es.run_all(n_rep=20, seed=2))
     assert "residues mod 20" in rep and "Wagstaff" in rep
+
+
+# --------------------------------------------------------------------------- GMP census helpers
+def test_rank_census_helpers_agree_with_pure_python():
+    from core_math.psi_sequence import fibonacci_mod, lucas_number_mod
+    from research import rank_census as rc
+
+    for p in (7, 13, 17, 19):
+        M = rc.mpz(2) ** p - 1
+        for n in (1, 2, 5, 31, 1000, 2 ** (p - 1), 2 ** p - 2):
+            assert int(rc.fib_mod_mersenne(rc.mpz(n), p, M)) == fibonacci_mod(n, int(M))
+            assert int(rc.lucas_mod_mersenne(rc.mpz(n), p, M)) == lucas_number_mod(n, int(M))
+    assert rc.small_prime_divisors_of_N(61) == [3, 5, 7, 11, 13, 31, 41, 61, 151]
+    r61 = rc.census_record(61)
+    assert r61["F_N_is_zero"] and not r61["F_N/2_is_zero"] and r61["q_dividing_cofactor"] == [3]   # cofactor 9 = 3²
+    r89 = rc.census_record(89)
+    assert r89["q_dividing_cofactor"] == [3]                                                      # cofactor 3
+    r127 = rc.census_record(127)
+    assert r127["alpha_is_2^p"]

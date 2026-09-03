@@ -1,0 +1,381 @@
+[
+ {
+  "p": 5,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.0
+ },
+ {
+  "p": 7,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 13,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   13
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.0
+ },
+ {
+  "p": 17,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   17
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.0
+ },
+ {
+  "p": 19,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 31,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 61,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   11,
+   13,
+   31,
+   41,
+   61,
+   151
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3
+  ],
+  "seconds": 0.0
+ },
+ {
+  "p": 89,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   17,
+   23,
+   89
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3
+  ],
+  "seconds": 0.0
+ },
+ {
+  "p": 107,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 127,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 521,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   11,
+   17,
+   31,
+   41,
+   53,
+   131,
+   157
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.0
+ },
+ {
+  "p": 607,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 1279,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 2203,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 2281,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   11,
+   13,
+   17,
+   31,
+   41,
+   61,
+   151,
+   191
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.1
+ },
+ {
+  "p": 3217,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   13,
+   17,
+   97
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.1
+ },
+ {
+  "p": 4253,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3
+  ],
+  "seconds": 0.1
+ },
+ {
+  "p": 4423,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 0.0
+ },
+ {
+  "p": 9689,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   17,
+   29,
+   43,
+   113,
+   127
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 1.2
+ },
+ {
+  "p": 9941,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   11,
+   29,
+   31,
+   41,
+   43,
+   71,
+   113,
+   127
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3
+  ],
+  "seconds": 1.7
+ },
+ {
+  "p": 11213,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 0.8
+ },
+ {
+  "p": 19937,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   17,
+   29,
+   43,
+   113,
+   127,
+   179
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3,
+   113
+  ],
+  "seconds": 7.7
+ },
+ {
+  "p": 21701,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   11,
+   29,
+   31,
+   41,
+   43,
+   71,
+   101,
+   113,
+   127
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3,
+   5
+  ],
+  "seconds": 12.7
+ },
+ {
+  "p": 23209,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   13,
+   17
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 8.2
+ },
+ {
+  "p": 44497,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   13,
+   17,
+   19,
+   37,
+   73,
+   97,
+   109
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   3
+  ],
+  "seconds": 64.3
+ },
+ {
+  "p": 86243,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 26.1
+ },
+ {
+  "p": 110503,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 46.6
+ }
+]
