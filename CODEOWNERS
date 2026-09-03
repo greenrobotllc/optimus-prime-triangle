@@ -1,5 +1,13 @@
-# Code paths of the OEIS@home pilot require maintainer review; volunteer PRs touch only data directories.
-/distributed/oeis_home/**    @andytriboletti
-/distributed/families/**     @andytriboletti
-/distributed/RELEASES.json   @andytriboletti
-/.github/**                  @andytriboletti
+# Code, family definitions, release allow-list, workflows and GENERATED trust data require maintainer review.
+# Volunteer PRs may touch only distributed/contributors, distributed/claims and distributed/results (enforced by verify-pr).
+/distributed/oeis_home/**            @andytriboletti
+/distributed/families/**             @andytriboletti
+/distributed/RELEASES.json           @andytriboletti
+/distributed/pyproject.toml          @andytriboletti
+/distributed/requirements-lock.txt   @andytriboletti
+/distributed/tests/**                @andytriboletti
+/distributed/verified/**             @andytriboletti
+/distributed/ledger/**               @andytriboletti
+/distributed/exports/**              @andytriboletti
+/distributed/docs/**                 @andytriboletti
+/.github/**                          @andytriboletti

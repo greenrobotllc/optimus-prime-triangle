@@ -50,9 +50,18 @@ def _b64u(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 
 
+_B64U_RE = __import__("re").compile(r"^[A-Za-z0-9_-]+$")
+
+
 def _unb64u(text: str) -> bytes:
+    """Strict base64url: alphabet-checked and round-trip canonical (rejects trailing-bit variants)."""
+    if not isinstance(text, str) or not _B64U_RE.match(text):
+        raise SignatureError("signature is not base64url")
     pad = "=" * (-len(text) % 4)
-    return base64.urlsafe_b64decode(text + pad)
+    raw = base64.urlsafe_b64decode(text + pad)
+    if _b64u(raw) != text:
+        raise SignatureError("signature encoding is not canonical")
+    return raw
 
 
 def sign_envelope(kind: str, payload: dict, sk: Ed25519PrivateKey) -> dict:
@@ -83,7 +92,7 @@ def verify_envelope(env: dict, expected_kind: str | None = None) -> str:
         raise SignatureError("signature must be 86 base64url characters")
     try:
         Ed25519PublicKey.from_public_bytes(pub_raw).verify(_unb64u(sig["sig"]), signing_message(kind, payload))
-    except (InvalidSignature, ValueError, CanonError) as exc:
+    except (InvalidSignature, ValueError, CanonError, SignatureError) as exc:
         raise SignatureError(f"signature does not verify: {exc}") from exc
     return sig["key"]
 
@@ -96,5 +105,5 @@ def verify_rotation(old_pub_raw: bytes, new_pub_raw: bytes, rotation_sig: str) -
     try:
         Ed25519PublicKey.from_public_bytes(old_pub_raw).verify(_unb64u(rotation_sig), ROTATION_PREFIX + new_pub_raw)
         return True
-    except (InvalidSignature, ValueError):
+    except (InvalidSignature, ValueError, SignatureError):
         return False

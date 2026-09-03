@@ -1,3 +1,0 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"oeis-home/v1/verified","type":"object","required":["kind","payload","signature"],
- "properties":{"kind":{"const":"verified"},"payload":{"type":"object"},"signature":{"type":"object","required":["alg","key","pubkey","sig"],
- "properties":{"alg":{"const":"ed25519"},"key":{"type":"string","pattern":"^k1:[0-9a-f]{64}$"},"pubkey":{"type":"string","pattern":"^[0-9a-f]{64}$"},"sig":{"type":"string","minLength":86,"maxLength":86}}}}}

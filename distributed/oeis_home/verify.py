@@ -31,9 +31,11 @@ class Report:
     errors: list[str] = field(default_factory=list)
     lines_checked: int = 0
     recomputed: int = 0
-    prp_confirmed: list[int] = field(default_factory=list)
+    prp_confirmed: list[str] = field(default_factory=list)
     wall_ms: int = 0
     payload: dict | None = None
+    reference_checked: int = 0
+    notes: list[str] = field(default_factory=list)
 
     def fail(self, msg: str) -> None:
         self.ok = False
@@ -42,59 +44,125 @@ class Report:
 
 def _read_envelope(path: Path, kind: str, rep: Report) -> tuple[dict | None, str]:
     try:
+        if Path(path).name.startswith("."):
+            raise CanonError("checkpoint or hidden file committed; delete it (results/**/.*.partial.json)")
         env = check_file_bytes(Path(path).read_bytes())
         fp = verify_envelope(env, kind)
         return env, fp
     except (CanonError, SignatureError, OSError) as exc:
         rep.fail(f"{path.name}: {exc}")
         return None, ""
+    except Exception as exc:  # noqa: BLE001 - a crafted file must never crash the verifier
+        rep.fail(f"{path.name}: malformed ({type(exc).__name__})")
+        return None, ""
+
+
+def _is_str(x) -> bool:
+    return isinstance(x, str)
+
+
+def _is_int(x) -> bool:
+    return isinstance(x, int) and not isinstance(x, bool)
 
 
 # --------------------------------------------------------------------------- contributors
-def verify_contributor_file(path: Path, pr_author_id: int | None, existing: dict[str, dict], maintainer: bool = False) -> Report:
+def verify_contributor_file(path: Path, pr_author_id: int | None, existing: dict[str, dict], maintainer: bool = False,
+                            pr_author_login: str | None = None, pending: dict[str, dict] | None = None) -> Report:
+    """``existing`` must be the registry of the BASE commit (never the overlaid working tree)."""
     rep = Report()
     env, fp = _read_envelope(path, "contributor", rep)
     if env is None:
         return rep
     p = env["payload"]
     required = {"login", "github_id", "fingerprint", "pubkey", "display_name", "oeis_credit_name", "role"}
-    if not required <= set(p):
-        rep.fail(f"{path.name}: missing fields {sorted(required - set(p))}")
+    if not isinstance(p, dict) or not required <= set(p):
+        rep.fail(f"{path.name}: missing fields")
         return rep
     login = p["login"]
-    if not isinstance(login, str) or not LOGIN_RE.match(login) or Path(path).stem != login:
+    if not _is_str(login) or not LOGIN_RE.match(login) or Path(path).stem != login:
         rep.fail(f"{path.name}: login must match the file name and ^[a-z0-9-]+$ / ext-")
-    if not isinstance(p["github_id"], int) or p["github_id"] < 0 or (login.startswith("ext-") != (p["github_id"] == 0)):
+        return rep
+    if not _is_int(p["github_id"]) or p["github_id"] < 0 or (login.startswith("ext-") != (p["github_id"] == 0)):
         rep.fail(f"{path.name}: github_id must be the numeric id (0 only for ext- logins)")
+    if not all(_is_str(p[k]) for k in ("fingerprint", "pubkey", "display_name", "oeis_credit_name", "role")):
+        rep.fail(f"{path.name}: string fields have the wrong type")
+        return rep
     if p["fingerprint"] != fp or p["fingerprint"] != env["signature"]["key"] or p["pubkey"] != env["signature"]["pubkey"]:
         rep.fail(f"{path.name}: fingerprint/pubkey do not match the signing key")
-    if not isinstance(p["display_name"], str) or not 1 <= len(p["display_name"]) <= 64:
-        rep.fail(f"{path.name}: display_name must be 1–64 characters")
-    if not isinstance(p["oeis_credit_name"], str) or len(p["oeis_credit_name"]) > 64:
-        rep.fail(f"{path.name}: oeis_credit_name must be ≤ 64 characters")
+    if not 1 <= len(p["display_name"]) <= 64 or len(p["oeis_credit_name"]) > 64:
+        rep.fail(f"{path.name}: display_name must be 1–64 and oeis_credit_name ≤ 64 characters")
     if p["role"] not in ("worker", "verifier", "bot") or (p["role"] != "worker" and not maintainer):
         rep.fail(f"{path.name}: role {p['role']!r} not allowed here")
-    if pr_author_id is not None and not login.startswith("ext-") and pr_author_id != p["github_id"]:
+    prev = p.get("previous_fingerprints", [])
+    if not isinstance(prev, list) or not all(_is_str(x) and FP_RE.match(x) for x in prev):
+        rep.fail(f"{path.name}: previous_fingerprints must be a list of fingerprints")
+    is_ext = login.startswith("ext-")
+    if pr_author_id is not None and not is_ext and pr_author_id != p["github_id"]:
         rep.fail(f"{path.name}: PR author id {pr_author_id} does not match github_id {p['github_id']}")
-    if login.startswith("ext-") and pr_author_id is not None and not maintainer:
+    if pr_author_login is not None and not is_ext and not maintainer and login != pr_author_login.lower():
+        rep.fail(f"{path.name}: login must be your own GitHub login ({pr_author_login.lower()})")
+    if is_ext and pr_author_id is not None and not maintainer:
         rep.fail(f"{path.name}: ext- registrations must come from a maintainer")
+    # one key, one login (base registry and the other files of the same PR)
+    for other_login, other in list(existing.items()) + list((pending or {}).items()):
+        if other_login != login and (other.get("fingerprint") == p["fingerprint"] or other.get("pubkey") == p["pubkey"]
+                                     or p["fingerprint"] in other.get("previous_fingerprints", [])):
+            rep.fail(f"{path.name}: this key is already registered under {other_login!r}")
     old = existing.get(login)
-    if old is not None and old["fingerprint"] != p["fingerprint"]:
-        if p.get("supersedes") != old["fingerprint"] or not isinstance(p.get("rotation_sig"), str):
-            rep.fail(f"{path.name}: replacing a registered key needs supersedes + rotation_sig")
-        elif not verify_rotation(bytes.fromhex(old["pubkey"]), bytes.fromhex(p["pubkey"]), p["rotation_sig"]):
-            rep.fail(f"{path.name}: rotation_sig does not verify under the old key")
+    if old is not None:
+        if old["github_id"] != p["github_id"] and not maintainer:
+            rep.fail(f"{path.name}: github_id may not change on an existing login")
+        if old["fingerprint"] != p["fingerprint"]:
+            if p.get("supersedes") != old["fingerprint"] or not _is_str(p.get("rotation_sig")):
+                rep.fail(f"{path.name}: replacing a registered key needs supersedes + rotation_sig")
+            elif not verify_rotation(bytes.fromhex(old["pubkey"]), bytes.fromhex(p["pubkey"]), p["rotation_sig"]):
+                rep.fail(f"{path.name}: rotation_sig does not verify under the old key")
+            elif old["fingerprint"] not in prev or not set(old.get("previous_fingerprints", [])) <= set(prev):
+                rep.fail(f"{path.name}: previous_fingerprints must keep the whole key history")
     rep.payload = p
     return rep
 
 
+def accepted_fingerprints(contributor: dict) -> set[str]:
+    """The current key plus every superseded key of a login (old results stay valid after rotation)."""
+    return {contributor["fingerprint"], *contributor.get("previous_fingerprints", [])}
+
+
 def load_contributors(repo: Path) -> dict[str, dict]:
-    """All registered contributors on this checkout (verified envelopes only)."""
+    """All registered contributors on this checkout (verified envelopes only; bad files are skipped)."""
     out: dict[str, dict] = {}
-    for path in sorted((Path(repo) / "distributed" / "contributors").glob("*.json")):
-        rep = verify_contributor_file(path, None, {}, maintainer=True)
+    cdir = Path(repo) / "distributed" / "contributors"
+    for path in sorted(cdir.glob("*.json")) if cdir.exists() else []:
+        try:
+            rep = verify_contributor_file(path, None, {}, maintainer=True)
+        except Exception:  # noqa: BLE001
+            continue
         if rep.ok and rep.payload:
             out[rep.payload["login"]] = rep.payload
+    return out
+
+
+def load_contributors_at(repo: Path, ref: str) -> dict[str, dict]:
+    """The registry as committed at git ``ref`` (what CI must trust, not the overlaid working tree)."""
+    import subprocess  # noqa: PLC0415
+    import tempfile  # noqa: PLC0415
+
+    names = subprocess.run(["git", "-C", str(repo), "ls-tree", "--name-only", ref, "distributed/contributors/"],
+                           capture_output=True, text=True, check=False).stdout.split()
+    out: dict[str, dict] = {}
+    with tempfile.TemporaryDirectory() as tmp:
+        for rel in names:
+            if not rel.endswith(".json"):
+                continue
+            blob = subprocess.run(["git", "-C", str(repo), "show", f"{ref}:{rel}"], capture_output=True, check=False).stdout
+            path = Path(tmp) / Path(rel).name
+            path.write_bytes(blob)
+            try:
+                rep = verify_contributor_file(path, None, {}, maintainer=True)
+            except Exception:  # noqa: BLE001
+                continue
+            if rep.ok and rep.payload:
+                out[rep.payload["login"]] = rep.payload
     return out
 
 
@@ -131,14 +199,14 @@ def _check_verdict_shape(rec: dict, n: int, v: str, fam: Family, errors: list[st
         return
     if rec["n"] != n or rec["variant"] != v:
         errors.append(f"n={n} {v}: candidate order mismatch (got n={rec['n']} {rec['variant']})")
-    if rec["v"] not in ("prime", "prp", "composite", "unit") or rec["method"] not in ("small", "factor", "fermat", "bpsw", "cert"):
+    if rec["v"] not in ("prime", "prp", "composite", "unit") or rec["method"] not in ("small", "factor", "fermat", "bpsw", "mr13", "cert"):
         errors.append(f"n={n} {v}: bad v/method {rec['v']}/{rec['method']}")
     if rec["method"] == "factor":
         if rec["v"] != "composite" or not isinstance(rec.get("factor"), str) or not rec["factor"].isdigit():
             errors.append(f"n={n} {v}: factor verdict malformed")
-    if rec["method"] in ("fermat", "bpsw") and not (isinstance(rec.get("res64"), str) and HEX16_RE.match(rec["res64"])):
+    if rec["method"] in ("fermat", "bpsw", "mr13") and not (isinstance(rec.get("res64"), str) and HEX16_RE.match(rec["res64"])):
         errors.append(f"n={n} {v}: res64 missing or malformed")
-    if rec["v"] == "prp" and (rec["method"] != "bpsw" or not isinstance(rec.get("sprp"), list)):
+    if rec["v"] == "prp" and (rec["method"] not in ("bpsw", "mr13") or not isinstance(rec.get("sprp"), list)):
         errors.append(f"n={n} {v}: prp must carry method bpsw and sprp bases")
     if rec["v"] == "prime" and rec["method"] == "cert" and not isinstance(rec.get("cert"), dict):
         errors.append(f"n={n} {v}: cert verdict without certificate")
@@ -149,7 +217,8 @@ def recompute_line(fam: Family, rec: dict, base: int) -> dict:
 
 
 def _same_verdict(mine: dict, theirs: dict) -> bool:
-    if mine["v"] != theirs["v"] or mine["method"] != theirs["method"] or mine["digits"] != theirs["digits"]:
+    same_method = mine["method"] == theirs["method"] or {mine["method"], theirs["method"]} == {"bpsw", "mr13"}
+    if mine["v"] != theirs["v"] or not same_method or mine["digits"] != theirs["digits"]:
         return False
     for k in ("factor", "res64", "sprp"):
         if mine.get(k) != theirs.get(k):
@@ -157,8 +226,15 @@ def _same_verdict(mine: dict, theirs: dict) -> bool:
     return True
 
 
+def result_stem_ok(stem: str, login: str) -> bool:
+    """``<login>.json`` or ``<login>-<k>.json`` with ``k ≥ 2`` (logins may themselves contain digits and dashes)."""
+    return stem == login or re.fullmatch(re.escape(login) + r"-(?:[2-9]|[1-9][0-9]+)", stem) is not None
+
+
 def verify_result_file(path: Path, fam: Family, contributors: dict[str, dict], releases: dict, full: bool = True,
-                       time_budget_s: float | None = None, reference_check: bool = True) -> Report:
+                       time_budget_s: float | None = None, reference_check: str = "optional") -> Report:
+    """``reference_check``: ``"require"`` (CI: the independent core_math evaluator must be present),
+    ``"optional"`` (skip with a note when absent) or ``"off"``."""
     t0 = time.perf_counter()
     rep = Report()
     env, fp = _read_envelope(path, "result", rep)
@@ -167,8 +243,13 @@ def verify_result_file(path: Path, fam: Family, contributors: dict[str, dict], r
     p = env["payload"]
     required = {"schema", "family", "family_hash", "unit_id", "n_lo", "n_hi", "login", "worker", "software", "base",
                 "verdicts", "summary", "nonce"}
-    if not required <= set(p):
-        rep.fail(f"{path.name}: missing fields {sorted(required - set(p))}")
+    if not isinstance(p, dict) or not required <= set(p):
+        rep.fail(f"{path.name}: missing fields")
+        return rep
+    if not (all(_is_str(p[k]) for k in ("schema", "family", "family_hash", "unit_id", "login", "worker", "nonce"))
+            and all(_is_int(p[k]) for k in ("n_lo", "n_hi", "base")) and isinstance(p["software"], dict)
+            and isinstance(p["verdicts"], list) and isinstance(p["summary"], dict)):
+        rep.fail(f"{path.name}: payload fields have the wrong types")
         return rep
     if p["schema"] != RESULT_SCHEMA or p["family"] != fam.id:
         rep.fail(f"{path.name}: schema/family mismatch")
@@ -184,12 +265,12 @@ def verify_result_file(path: Path, fam: Family, contributors: dict[str, dict], r
         rep.fail(f"{path.name}: {exc}")
         return rep
     c = contributors.get(p["login"])
-    if Path(path).stem != p["login"]:
-        rep.fail(f"{path.name}: file name must be <login>.json")
+    if not result_stem_ok(Path(path).stem, p["login"]):
+        rep.fail(f"{path.name}: file name must be <login>.json or <login>-<k>.json")
     if c is None:
         rep.fail(f"{path.name}: login {p['login']!r} is not registered")
-    elif c["fingerprint"] != fp or p["worker"] != fp:
-        rep.fail(f"{path.name}: signing key is not the registered key of {p['login']}")
+    elif fp not in accepted_fingerprints(c) or p["worker"] != fp:
+        rep.fail(f"{path.name}: signing key is not a registered key of {p['login']}")
     sw = p["software"]
     accepted = {r["worker_sha256"] for r in releases.get("accepted", [])}
     withdrawn = {r["worker_sha256"] for r in releases.get("withdrawn", [])}
@@ -208,6 +289,9 @@ def verify_result_file(path: Path, fam: Family, contributors: dict[str, dict], r
         return rep
     errors: list[str] = []
     for rec, (n, v) in zip(verdicts, cands, strict=True):
+        if not isinstance(rec, dict):
+            errors.append(f"n={n} {v}: verdict is not an object")
+            continue
         _check_verdict_shape(rec, n, v, fam, errors)
     if errors:
         for e in errors[:20]:
@@ -229,19 +313,23 @@ def verify_result_file(path: Path, fam: Family, contributors: dict[str, dict], r
             continue
         if rec["v"] == "prp":
             N = abs_value(rec["variant"], rec["n"])
-            if reference_check:
+            if reference_check != "off":
                 try:
                     from .families import reference_value  # noqa: PLC0415
 
                     if abs(reference_value(rec["variant"], rec["n"])) != N:
                         rep.fail(f"{path.name}: n={rec['n']}: value cross-check against core_math failed")
                         continue
+                    rep.reference_checked += 1
                 except ImportError:
-                    pass
+                    if reference_check == "require":
+                        rep.fail(f"{path.name}: n={rec['n']}: independent core_math evaluator unavailable (set PYTHONPATH to the repository root)")
+                        continue
+                    rep.notes.append(f"n={rec['n']} {rec['variant']}: core_math cross-check skipped (not importable here)")
                 if rec["digits"] <= 5000 and pow(3, int(N) - 1, int(N)) != 1:
                     rep.fail(f"{path.name}: n={rec['n']}: pure-Python Fermat check failed")
                     continue
-            rep.prp_confirmed.append(rec["n"])
+            rep.prp_confirmed.append(f"{rec['n']}/{rec['variant']}")
     rep.payload = p
     rep.wall_ms = int((time.perf_counter() - t0) * 1000)
     return rep
@@ -264,18 +352,29 @@ def filtered_check(fam: Family, uid: str) -> dict:
 
 # --------------------------------------------------------------------------- pull requests
 def verify_pr(repo: Path, changed: list[tuple[str, str]], pr_author_id: int | None, fam: Family, releases: dict,
-              maintainer: bool = False, full: bool = True, time_budget_s: float | None = None) -> Report:
-    """Path policy plus every file check; ``changed`` is ``[(status, path)]`` relative to the repo root."""
+              maintainer: bool = False, full: bool = True, time_budget_s: float | None = None,
+              base_contributors: dict[str, dict] | None = None, pr_author_login: str | None = None,
+              reference_check: str = "require") -> Report:
+    """Path policy plus every file check.
+
+    ``changed`` is ``[(status, path)]`` relative to the repo root (merge-base diff).  ``base_contributors``
+    is the registry of the base commit; when ``None`` it is read from the working tree, which is only
+    safe outside CI (the workflow overlays the PR's data directories before running this).
+    """
     rep = Report()
-    existing = load_contributors(repo)
+    existing = base_contributors if base_contributors is not None else load_contributors(repo)
     contributors = dict(existing)
+    pending: dict[str, dict] = {}
     contributor_paths, claim_paths, result_paths = [], [], []
     for status, rel in changed:
         if not rel.startswith(ALLOWED_DIRS):
             rep.fail(f"{rel}: outside the volunteer-writable directories")
             continue
-        if status == "D" or status == "R":
-            rep.fail(f"{rel}: deleting or renaming files is not allowed")
+        if status in ("D", "R", "C", "T"):
+            rep.fail(f"{rel}: deleting, renaming or retyping files is not allowed")
+            continue
+        if Path(rel).name.startswith("."):
+            rep.fail(f"{rel}: hidden/checkpoint files must not be committed (delete results/**/.*.partial.json)")
             continue
         if rel.startswith("distributed/contributors/"):
             if status == "M" and Path(rel).stem not in existing:
@@ -287,24 +386,39 @@ def verify_pr(repo: Path, changed: list[tuple[str, str]], pr_author_id: int | No
             claim_paths.append(rel)
         else:
             if status != "A":
-                rep.fail(f"{rel}: results are add-only (rerun the unit instead of editing)")
+                rep.fail(f"{rel}: results are add-only; a wrong merged file is withdrawn by a maintainer (open an issue), "
+                         "and a fresh run goes to <login>-2.json")
             result_paths.append(rel)
     for rel in contributor_paths:
-        r = verify_contributor_file(Path(repo) / rel, pr_author_id, existing, maintainer=maintainer)
+        try:
+            r = verify_contributor_file(Path(repo) / rel, pr_author_id, existing, maintainer=maintainer,
+                                        pr_author_login=pr_author_login, pending=pending)
+        except Exception as exc:  # noqa: BLE001
+            r = Report(ok=False, errors=[f"{rel}: malformed ({type(exc).__name__})"])
         rep.errors += r.errors
         rep.ok &= r.ok
         if r.ok and r.payload:
+            pending[r.payload["login"]] = r.payload
             contributors[r.payload["login"]] = r.payload
     for rel in claim_paths:
-        r = verify_claim_file(Path(repo) / rel, fam, contributors)
+        try:
+            r = verify_claim_file(Path(repo) / rel, fam, contributors)
+        except Exception as exc:  # noqa: BLE001
+            r = Report(ok=False, errors=[f"{rel}: malformed ({type(exc).__name__})"])
         rep.errors += r.errors
         rep.ok &= r.ok
     for rel in result_paths:
-        r = verify_result_file(Path(repo) / rel, fam, contributors, releases, full=full, time_budget_s=time_budget_s)
+        try:
+            r = verify_result_file(Path(repo) / rel, fam, contributors, releases, full=full, time_budget_s=time_budget_s,
+                                   reference_check=reference_check)
+        except Exception as exc:  # noqa: BLE001
+            r = Report(ok=False, errors=[f"{rel}: malformed ({type(exc).__name__})"])
         rep.errors += r.errors
+        rep.notes += r.notes
         rep.ok &= r.ok
         rep.lines_checked += r.lines_checked
         rep.recomputed += r.recomputed
+        rep.reference_checked += r.reference_checked
         rep.prp_confirmed += r.prp_confirmed
         if r.ok and r.payload and pr_author_id is not None:
             c = contributors.get(r.payload["login"], {})

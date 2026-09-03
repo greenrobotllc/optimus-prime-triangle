@@ -13,7 +13,8 @@ import unicodedata
 
 MAX_INT = 2**53 - 1
 PREFIX = b"oeis-home/v1/"
-KINDS = ("contributor", "claim", "result", "verified")
+KINDS = ("contributor", "claim", "result", "verified", "note")
+MAX_FILE_BYTES = 8 * 1024 * 1024
 
 
 class CanonError(ValueError):
@@ -32,6 +33,8 @@ def check_profile(obj, path: str = "$") -> None:
     if isinstance(obj, str):
         if unicodedata.normalize("NFC", obj) != obj:
             raise CanonError(f"{path}: string is not NFC")
+        if any("\ud800" <= ch <= "\udfff" for ch in obj):
+            raise CanonError(f"{path}: lone surrogate in string")
         return
     if isinstance(obj, list):
         for i, v in enumerate(obj):
@@ -63,8 +66,14 @@ def _no_duplicates(pairs):
 
 
 def loads_strict(data: bytes):
+    if len(data) > MAX_FILE_BYTES:
+        raise CanonError(f"file larger than {MAX_FILE_BYTES} bytes")
     try:
-        return json.loads(data.decode("utf-8"), object_pairs_hook=_no_duplicates)
+        obj = json.loads(data.decode("utf-8"), object_pairs_hook=_no_duplicates)
+        check_profile(obj)
+        return obj
+    except RecursionError as exc:
+        raise CanonError("nesting too deep") from exc
     except UnicodeDecodeError as exc:
         raise CanonError(f"not UTF-8: {exc}") from exc
     except json.JSONDecodeError as exc:

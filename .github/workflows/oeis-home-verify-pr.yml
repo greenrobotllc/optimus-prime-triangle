@@ -2,7 +2,6 @@ name: oeis-home verify PR
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
-    paths: ["distributed/contributors/**", "distributed/claims/**", "distributed/results/**"]
 permissions:
   contents: read
   pull-requests: read
@@ -17,25 +16,30 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Fetch the PR head and overlay ONLY the data directories
+      - name: Fetch the PR head and overlay ONLY the data files it changed
         run: |
           git fetch --no-tags origin +refs/pull/${{ github.event.pull_request.number }}/head:pr-head
-          git checkout pr-head -- distributed/contributors distributed/claims distributed/results
+          git diff --name-status --diff-filter=AM ${{ github.event.pull_request.base.sha }}...pr-head -- \
+            distributed/contributors distributed/claims distributed/results > changed.txt || true
+          cut -f2- changed.txt | while IFS= read -r f; do [ -n "$f" ] && git checkout pr-head -- "$f"; done
+          echo "overlaid $(wc -l < changed.txt) data file(s)"
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - name: Install pinned worker dependencies
+      - name: Install pinned worker dependencies (no build isolation, no editable install)
+        run: python -m pip install --require-hashes -r distributed/requirements-lock.txt
+      - name: Verify every changed file and recompute every line with the base branch's code
+        env:
+          PYTHONPATH: ${{ github.workspace }}/distributed:${{ github.workspace }}
         run: |
-          python -m pip install --require-hashes -r distributed/requirements-lock.txt
-          python -m pip install -e distributed --no-deps
-      - name: Verify every changed file and recompute every line
-        run: |
-          oeis-home verify-pr --base ${{ github.event.pull_request.base.sha }} --head pr-head \
-            --author-id ${{ github.event.pull_request.user.id }} --summary-file verification.json
+          python -m oeis_home.cli verify-pr --base ${{ github.event.pull_request.base.sha }} --head pr-head \
+            --author-id ${{ github.event.pull_request.user.id }} --author-login "${{ github.event.pull_request.user.login }}" \
+            --require-reference --summary-file verification.json
       - name: Job summary
         if: always()
         run: |
           echo '## oeis-home verification' >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"; cat verification.json >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f verification.json ]; then echo '```json' >> "$GITHUB_STEP_SUMMARY"; cat verification.json >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY";
+          else echo 'verification did not run (see the earlier failed step)' >> "$GITHUB_STEP_SUMMARY"; fi
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: verification, path: verification.json }
+        with: { name: verification, path: verification.json, if-no-files-found: ignore }

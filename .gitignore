@@ -6,3 +6,5 @@ __pycache__/
 *.pt
 .DS_Store
 out.json
+distributed/results/**/.*.partial.json
+distributed/results/**/.*.tmp

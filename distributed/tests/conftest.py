@@ -45,7 +45,12 @@ def fixture_keys():
 def contributor_payload(login: str, sk, github_id: int, role: str = "worker") -> dict:
     pub = keys.public_raw(sk)
     return {"login": login, "github_id": github_id, "fingerprint": keys.fingerprint(pub), "pubkey": pub.hex(),
-            "display_name": login.title(), "oeis_credit_name": "", "role": role}
+            "display_name": login.title(), "oeis_credit_name": "", "role": role, "previous_fingerprints": []}
+
+
+@pytest.fixture(scope="session")
+def make_contributor():
+    return contributor_payload
 
 
 @pytest.fixture(scope="session")
@@ -61,4 +66,6 @@ def tiny_repo(tmp_path_factory, tiny_family_path, fixture_keys) -> Path:
     for login, gid in (("alice", 1001), ("bob", 1002)):
         env = keys.sign_envelope("contributor", contributor_payload(login, fixture_keys[login], gid), fixture_keys[login])
         (d / "contributors" / f"{login}.json").write_bytes(canon.file_bytes(env))
+    env = keys.sign_envelope("contributor", contributor_payload("ext-bot", fixture_keys["bot"], 0, role="bot"), fixture_keys["bot"])
+    (d / "contributors" / "ext-bot.json").write_bytes(canon.file_bytes(env))
     return root

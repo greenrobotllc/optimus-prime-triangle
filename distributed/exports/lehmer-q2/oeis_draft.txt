@@ -13,10 +13,18 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 %F A1 G.f.: (2 + x - x^2 - 2*x^3)/(1 - x^2 + 4*x^4).
 %F A1 a(2n) = V_n(1,4) = A272931(n); 2*a(2n+1) = V_n(1,4) - 3*U_n(1,4).
 %F A1 a(n) = 5^floor(n/2) * V_n(1, 2/5), V the Lucas sequence with V_0 = 2, V_1 = P.
+%F A1 a(2n) = V_n(1,4) = A272931(n); U_n(1,4) = A106853(n-1) for n >= 1.
 %e A1 a(2) = 5*a(1) - 2*a(0) = 1; a(3) = a(2) - 2*a(1) = -1; a(4) = 5*a(3) - 2*a(2) = -7.
 %t A1 LinearRecurrence[{0, 1, 0, -4}, {2, 1, 1, -1}, 45]
 %o A1 (PARI) a(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 5, 1)*q - 2*p]); q)
-%Y A1 Cf. A272931 (bisection), A2, A3, A000032, A001606.
+%o A1 (PARI) Vec((2 + x - x^2 - 2*x^3)/(1 - x^2 + 4*x^4) + O(x^45))
+%o A1 (Python)
+%o A1 def a(n):
+%o A1     if n == 0: return 2
+%o A1     p, q = 2, 1
+%o A1     for k in range(1, n): p, q = q, (5 if k % 2 else 1)*q - 2*p
+%o A1     return q
+%Y A1 Cf. A272931 (bisection), A106853, A2, A3, A000032, A001606.
 %K A1 sign,easy
 %O A1 0,1
 %A A1 _Andy Triboletti_, Sep 03 2026
@@ -33,34 +41,147 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 %F A2 a(n) = -a(n-2) - 4*a(n-4) for n >= 4.
 %F A2 G.f.: (2 + x + x^2 - 2*x^3)/(1 + x^2 + 4*x^4).
 %F A2 a(2n) = (-1)^n*V_n(1,4); 2*a(2n+1) = (-1)^n*(V_n(1,4) + 5*U_n(1,4)).
+%F A2 a(n) = 3^floor(n/2) * V_n(1, 2/3).
 %e A2 a(2) = 3*a(1) - 2*a(0) = -1; a(3) = a(2) - 2*a(1) = -3; a(4) = 3*a(3) - 2*a(2) = -7.
 %t A2 LinearRecurrence[{0, -1, 0, -4}, {2, 1, -1, -3}, 45]
 %o A2 (PARI) a(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 3, 1)*q - 2*p]); q)
+%o A2 (PARI) Vec((2 + x + x^2 - 2*x^3)/(1 + x^2 + 4*x^4) + O(x^45))
 %Y A2 Cf. A272931, A1, A4.
 %K A2 sign,easy
 %O A2 0,1
 %A A2 _Andy Triboletti_, Sep 03 2026
+%D A2 D. H. Lehmer, An extended theory of Lucas' functions, Ann. of Math. (2) 31 (1930), 419-448.
+%H A2 M. Ibrahim, <a href="https://arxiv.org/abs/2404.05772">Generalizing the Eight Levels Theorem</a>, arXiv:2404.05772 [math.GM], 2024.
+%H A2 <a href="/index/Rec#order_04">Index entries for linear recurrences with constant coefficients</a>, signature (0,-1,0,-4).
 
 %I A3
-%S A3 
+%S A3 0,4,5,6,8,9,10,11,12,13,14,16,17,19,21,22,26,29,31,32,34,43,46,47,58,59,61,67,73,82,86,94,101,109,113,127
 %N A3 Numbers k such that |A1(k)| is prime, where A1(k) = Vbar_k(sqrt(5), 2) is the Lehmer companion sequence with R = 5, Q = 2.
 %C A3 Since A1(m) divides A1(k) whenever k/m is odd and |A1(m)| = 1 only for m = 1, 2, 3, 7, a term k >= 16 is prime, twice a prime, a power of 2, or one of 21, 49; 21 is a term.
 %C A3 The even terms are 2*j with |A272931(j)| prime and coincide with the even terms of A4.
 %C A3 Terms in DATA are proven primes; further probable-prime indices are listed in the b-file and marked in the extensions.
+%C A3 137 is a term, but its position is not yet determined; the corresponding 21-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 139 is a term, but its position is not yet determined; the corresponding 21-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 146 is a term, but its position is not yet determined; the corresponding 22-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 179 is a term, but its position is not yet determined; the corresponding 27-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 181 is a term, but its position is not yet determined; the corresponding 28-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 214 is a term, but its position is not yet determined; the corresponding 33-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 218 is a term, but its position is not yet determined; the corresponding 33-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 269 is a term, but its position is not yet determined; the corresponding 40-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 277 is a term, but its position is not yet determined; the corresponding 42-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 307 is a term, but its position is not yet determined; the corresponding 46-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 314 is a term, but its position is not yet determined; the corresponding 48-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 331 is a term, but its position is not yet determined; the corresponding 50-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 347 is a term, but its position is not yet determined; the corresponding 53-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 353 is a term, but its position is not yet determined; the corresponding 54-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 367 is a term, but its position is not yet determined; the corresponding 56-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 401 is a term, but its position is not yet determined; the corresponding 61-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 503 is a term, but its position is not yet determined; the corresponding 75-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 614 is a term, but its position is not yet determined; the corresponding 93-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 662 is a term, but its position is not yet determined; the corresponding 100-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 706 is a term, but its position is not yet determined; the corresponding 107-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 787 is a term, but its position is not yet determined; the corresponding 119-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 794 is a term, but its position is not yet determined; the corresponding 120-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 982 is a term, but its position is not yet determined; the corresponding 149-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1019 is a term, but its position is not yet determined; the corresponding 154-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1039 is a term, but its position is not yet determined; the corresponding 157-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1138 is a term, but its position is not yet determined; the corresponding 172-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1279 is a term, but its position is not yet determined; the corresponding 193-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1289 is a term, but its position is not yet determined; the corresponding 194-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1373 is a term, but its position is not yet determined; the corresponding 207-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1454 is a term, but its position is not yet determined; the corresponding 220-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1549 is a term, but its position is not yet determined; the corresponding 234-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1777 is a term, but its position is not yet determined; the corresponding 268-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 1913 is a term, but its position is not yet determined; the corresponding 288-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 2179 is a term, but its position is not yet determined; the corresponding 328-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 2273 is a term, but its position is not yet determined; the corresponding 343-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 2371 is a term, but its position is not yet determined; the corresponding 357-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 2446 is a term, but its position is not yet determined; the corresponding 369-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 2459 is a term, but its position is not yet determined; the corresponding 371-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 3761 is a term, but its position is not yet determined; the corresponding 567-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 3919 is a term, but its position is not yet determined; the corresponding 590-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 4127 is a term, but its position is not yet determined; the corresponding 622-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 4138 is a term, but its position is not yet determined; the corresponding 624-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 5227 is a term, but its position is not yet determined; the corresponding 786-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 8594 is a term, but its position is not yet determined; the corresponding 1294-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 8641 is a term, but its position is not yet determined; the corresponding 1301-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 8831 is a term, but its position is not yet determined; the corresponding 1329-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 9011 is a term, but its position is not yet determined; the corresponding 1356-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 12497 is a term, but its position is not yet determined; the corresponding 1881-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 13457 is a term, but its position is not yet determined; the corresponding 2026-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 15451 is a term, but its position is not yet determined; the corresponding 2326-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A3 17522 is a term, but its position is not yet determined; the corresponding 2638-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %e A3 4 is a term because |A1(4)| = 7 is prime; 7 is not a term because |A1(7)| = 1.
 %o A3 (PARI) A1(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 5, 1)*q - 2*p]); q);
-%o A3 (PARI) select(n->isprime(abs(A1(n))), [0..1500])
+%o A3 (PARI) select(n->isprime(abs(A1(n))), [0..1500]) \ ispseudoprime for a fast search
+%o A3 (Python)
+%o A3 from sympy import isprime
+%o A3 def A1(n):
+%o A3     if n == 0: return 2
+%o A3     p, q = 2, 1
+%o A3     for k in range(1, n): p, q = q, (5 if k % 2 else 1)*q - 2*p
+%o A3     return q
+%o A3 print([n for n in range(1501) if isprime(abs(A1(n)))])
 %Y A3 Cf. A1, A4, A272931, A001606.
 %K A3 nonn,more
 %O A3 1,2
 %A A3 _Andy Triboletti_, Sep 03 2026
-
+%E A3 a(1)-a(36) found by an OEIS@home volunteer (Andy Triboletti), contributed by _Andy Triboletti_, Sep 03 2026
 
 %I A4
-%S A4 
+%S A4 0,3,4,6,7,8,10,11,12,13,14,16,17,19,22,23,25,26,29,31,32,34,37,46,58,59,61,82,83,86,89,94,97,109
 %N A4 Numbers k such that |A2(k)| is prime, where A2(k) = Vbar_k(sqrt(3), 2) is the Lehmer companion sequence with R = 3, Q = 2.
 %C A4 Since A2(m) divides A2(k) whenever k/m is odd and |A2(m)| = 1 only for m = 1, 2, 5, a term k >= 16 is prime, twice a prime, a power of 2, or 25; 25 is a term.
 %C A4 The even terms coincide with those of A3.
+%C A4 Terms in DATA are proven primes; further probable-prime indices are listed in the b-file and marked in the extensions.
+%C A4 131 is a term, but its position is not yet determined; the corresponding 20-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 146 is a term, but its position is not yet determined; the corresponding 22-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 149 is a term, but its position is not yet determined; the corresponding 23-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 151 is a term, but its position is not yet determined; the corresponding 23-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 163 is a term, but its position is not yet determined; the corresponding 25-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 197 is a term, but its position is not yet determined; the corresponding 30-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 214 is a term, but its position is not yet determined; the corresponding 33-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 218 is a term, but its position is not yet determined; the corresponding 33-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 251 is a term, but its position is not yet determined; the corresponding 38-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 314 is a term, but its position is not yet determined; the corresponding 48-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 331 is a term, but its position is not yet determined; the corresponding 50-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 409 is a term, but its position is not yet determined; the corresponding 62-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 431 is a term, but its position is not yet determined; the corresponding 65-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 461 is a term, but its position is not yet determined; the corresponding 70-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 463 is a term, but its position is not yet determined; the corresponding 70-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 523 is a term, but its position is not yet determined; the corresponding 79-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 577 is a term, but its position is not yet determined; the corresponding 87-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 614 is a term, but its position is not yet determined; the corresponding 93-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 662 is a term, but its position is not yet determined; the corresponding 100-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 706 is a term, but its position is not yet determined; the corresponding 107-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 709 is a term, but its position is not yet determined; the corresponding 107-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 719 is a term, but its position is not yet determined; the corresponding 108-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 757 is a term, but its position is not yet determined; the corresponding 114-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 794 is a term, but its position is not yet determined; the corresponding 120-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 887 is a term, but its position is not yet determined; the corresponding 133-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 982 is a term, but its position is not yet determined; the corresponding 149-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 1138 is a term, but its position is not yet determined; the corresponding 172-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 1454 is a term, but its position is not yet determined; the corresponding 220-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 1663 is a term, but its position is not yet determined; the corresponding 250-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 1999 is a term, but its position is not yet determined; the corresponding 301-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 2131 is a term, but its position is not yet determined; the corresponding 321-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 2446 is a term, but its position is not yet determined; the corresponding 369-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 2677 is a term, but its position is not yet determined; the corresponding 403-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 2879 is a term, but its position is not yet determined; the corresponding 433-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 3061 is a term, but its position is not yet determined; the corresponding 461-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 3659 is a term, but its position is not yet determined; the corresponding 551-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 4138 is a term, but its position is not yet determined; the corresponding 624-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 4201 is a term, but its position is not yet determined; the corresponding 633-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 4673 is a term, but its position is not yet determined; the corresponding 704-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 6827 is a term, but its position is not yet determined; the corresponding 1028-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 8594 is a term, but its position is not yet determined; the corresponding 1294-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 8599 is a term, but its position is not yet determined; the corresponding 1294-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 8669 is a term, but its position is not yet determined; the corresponding 1305-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 12119 is a term, but its position is not yet determined; the corresponding 1825-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 16189 is a term, but its position is not yet determined; the corresponding 2437-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 17522 is a term, but its position is not yet determined; the corresponding 2638-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 17903 is a term, but its position is not yet determined; the corresponding 2695-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
+%C A4 18121 is a term, but its position is not yet determined; the corresponding 2728-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %e A4 3 is a term because |A2(3)| = 3 is prime; 5 is not a term because |A2(5)| = 1.
 %o A4 (PARI) A2(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 3, 1)*q - 2*p]); q);
 %o A4 (PARI) select(n->isprime(abs(A2(n))), [0..1500])
@@ -68,4 +189,4 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 %K A4 nonn,more
 %O A4 1,2
 %A A4 _Andy Triboletti_, Sep 03 2026
-
+%E A4 a(1)-a(34) found by an OEIS@home volunteer (Andy Triboletti), contributed by _Andy Triboletti_, Sep 03 2026

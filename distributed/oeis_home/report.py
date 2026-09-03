@@ -44,7 +44,8 @@ def _self_check_snippet(ledger: dict) -> str:
         for rec in u.get("verdicts", []):
             if rec.get("method") == "factor":
                 b = -1 if rec["variant"] in ("m1", "even") else 1
-                return (f"# a verified factor line from unit {u['unit_id']}\n"
+                return ("# run from the repository root after `pip install -e distributed` (or with PYTHONPATH=.:distributed)\n"
+                        f"# a verified factor line from unit {u['unit_id']}\n"
                         f"from core_math.psi_sequence import psi_mod\nprint(psi_mod(2, {b}, {rec['n']}, {rec['factor']}) == 0)   # True\n"
                         f"from oeis_home.families import abs_value\nprint(abs_value({rec['variant']!r}, {rec['n']}) % {rec['factor']} == 0)   # True")
     return "# no verified factor line yet"
@@ -63,7 +64,7 @@ def render_site(ledger: dict, contributors: dict[str, dict], fam: Family, out: P
         f"<td>{html.escape(contributors.get(p.get('discoverer_login', ''), {}).get('display_name', p.get('discoverer_login', '')))}</td>"
         f"<td>{html.escape(p.get('discovered_at', '')[:10])}</td>"
         f"<td>{html.escape(contributors.get(p.get('verifier_login', ''), {}).get('display_name', p.get('verifier_login', '') or '—'))}</td>"
-        f"<td>{'yes' if p.get('ci_confirmed') else 'no'}</td><td>{html.escape(p.get('maintainer_pari', 'none'))}</td></tr>"
+        f"<td>{html.escape(str(p.get('ci_run_id', 'local')) if p.get('ci_confirmed') else 'local only')}</td><td>{html.escape(p.get('maintainer_pari', 'none'))}</td></tr>"
         for p in terms)
     cells = "".join(f'<div class=cell style="background:{STATE_COLORS[u["state"]]}" title="{uid}: {u["state"]}; {", ".join(r["login"] for r in u["results"]) or "nobody yet"}"></div>'
                     for uid, u in ledger["units"].items())
@@ -76,7 +77,7 @@ def render_site(ledger: dict, contributors: dict[str, dict], fam: Family, out: P
 <header>
 <p class=muted>OEIS@home pilot · family <code>lehmer-q2</code> · <code>{html.escape(fam.hash)}</code></p>
 <h1>Primes in the Lehmer companion sequences with Q = 2</h1>
-<p>a(n) = Ψ(2, −1, n) = V̄<sub>n</sub>(√5, 2) and Ψ(2, 1, n) = V̄<sub>n</sub>(√3, 2); even indices share V<sub>n/2</sub>(1, 4). Every line of every result is recomputed by CI with the volunteer's own test base; a second result from a different account is the double check that earns credit. Rebuilt {now}{(' from ' + html.escape(built_from)) if built_from else ''}.</p>
+<p>a(n) = Ψ(2, −1, n) = V̄<sub>n</sub>(√5, 2) and Ψ(2, 1, n) = V̄<sub>n</sub>(√3, 2); even indices share V<sub>n/2</sub>(1, 4). Every line of every result is recomputed with the volunteer's own test base; rows marked "local only" were checked by a local rebuild, not by CI. A second result from a different account is the double check that earns credit. Rebuilt {now}{(' from ' + html.escape(built_from)) if built_from else ''}{' (unsigned local rebuild)' if any(u.get('unsigned') for u in ledger['units'].values()) else ''}.</p>
 <dl class=stats>
 <div><dt>Units verified</dt><dd>{c['verified'] + c['double_checked']} / {total}</dd></div>
 <div><dt>Double-checked</dt><dd>{c['double_checked']}</dd></div>
@@ -86,7 +87,7 @@ def render_site(ledger: dict, contributors: dict[str, dict], fam: Family, out: P
 </dl>
 </header>
 <section><h2>Terms found</h2>
-<div class=wrap><table><thead><tr><th>n</th><th>variant</th><th>digits</th><th>status</th><th>discoverer</th><th>discovered</th><th>verifier</th><th>CI</th><th>gp check</th></tr></thead><tbody>{rows or '<tr><td colspan=9>none yet</td></tr>'}</tbody></table></div>
+<div class=wrap><table><thead><tr><th>n</th><th>variant</th><th>digits</th><th>status</th><th>discoverer</th><th>discovered</th><th>verifier</th><th>CI run</th><th>gp check</th></tr></thead><tbody>{rows or '<tr><td colspan=9>none yet</td></tr>'}</tbody></table></div>
 <p class=muted>Seed indices n ≤ 120 were known before the pilot (repository); everything larger is new data. "prp" = BPSW plus strong probable-prime tests to bases 2, 3 and the worker base; "prime" = proven with PARI isprime or deterministic below 2^64.</p></section>
 <section><h2>Unit map</h2><div class=map>{cells}</div>
 <div class=legend><span style="--sw:var(--open)">open</span><span style="--sw:var(--claimed)">claimed</span><span style="--sw:var(--pending)">pending</span><span style="--sw:var(--verified)">verified (1 result, CI recomputed)</span><span style="--sw:var(--double)">double-checked (2 accounts)</span><span style="--sw:var(--disputed)">disputed / invalid</span></div>

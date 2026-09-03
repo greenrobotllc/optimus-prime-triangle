@@ -23,7 +23,9 @@ is an additional, credit-bearing double check, not the trust anchor.
        oeis-home keygen
        oeis-home register --login YOURLOGIN --display-name "Your Name" [--oeis-credit-name "Your Real Name"]
 
-   This writes `distributed/contributors/yourlogin.json`. It can go in the same pull request as your first
+   `register` looks up your numeric GitHub id online; offline, pass `--github-id N` (find it at
+   `https://api.github.com/users/YOURLOGIN`). The login must be your own GitHub login: CI compares it with
+   the PR author. This writes `distributed/contributors/yourlogin.json`. It can go in the same pull request as your first
    result. Use a GitHub noreply commit e-mail if you do not want your e-mail in the public history.
 
 3. Pick and run a unit (claims are optional; two people finishing the same unit is the double check):
@@ -48,8 +50,11 @@ green PRs within about two days. The results page is rebuilt on every merge.
 
 ## Rules
 
-- One key per GitHub account. Never edit a signed file; rerun `run` instead.
-- You cannot be the second result for your own unit.
+- One key per GitHub account, one account per key. Never edit a signed file. Merged results are add-only:
+  if one of yours turns out wrong, open an issue so a maintainer withdraws it; a fresh run of the same unit
+  is written as `YOURLOGIN-2.json` (`oeis-home run --force`).
+- You cannot be the second result for your own unit (two keys of one account count once).
+- Key rotation: `oeis-home register ... --old-key <old file>`; your earlier results stay valid.
 - Discoverer = earliest pull request (creation time) containing a verified probable-prime line;
   verifier = second distinct account (or a maintainer verifier key). Both are named on the page and in
   the OEIS extension line, using your `--oeis-credit-name` if you gave one.

@@ -6,8 +6,9 @@ Order of decision for a candidate ``(variant, n)`` with ``N = |Psi|``:
    (deterministic Miller–Rabin over the first 13 prime bases, exact below 3.3·10^24).
 2. structured trial division → ``composite``, ``method "factor"``, ``factor q``.
 3. Fermat test to the per-worker base → ``composite``, ``method "fermat"`` (``res64`` kept).
-4. BPSW (``gmpy2.is_prime``) plus strong-probable-prime tests to bases 2, 3 and the worker base →
-   ``prp`` (``method "bpsw"``, ``sprp`` bases, ``res64``) or ``composite``.
+4. BPSW (``gmpy2.is_prime``: BPSW plus one Miller–Rabin round) and strong-probable-prime tests to
+   bases 2, 3 and the worker base → ``prp`` (``method "bpsw"``, ``sprp`` bases, ``res64``) or
+   ``composite``.  Without gmpy2 the fallback uses 13 fixed Miller–Rabin bases and is labelled ``mr13``.
 ``prime`` for ``N ≥ 2^64`` needs a certificate (optional tier, maintainer only).
 """
 from __future__ import annotations
@@ -107,12 +108,17 @@ def verdict(fam: Family, variant: str, n: int, base: int) -> dict:
     if r != 1:
         rec.update(v="composite", method="fermat", res64=res64)
         return rec
-    bpsw = bool(gmpy2.is_prime(N, fam.mr_rounds)) if HAVE_GMPY2 else small_prime_decision(int(N)) == "prime"
     bases = [*fam.sprp_bases, base]
+    if HAVE_GMPY2:
+        bpsw = bool(gmpy2.is_prime(N, fam.mr_rounds))
+        method = "bpsw"
+    else:  # pure-Python fallback: 13 fixed Miller–Rabin bases, labelled honestly
+        bpsw = small_prime_decision(int(N)) == "prime"
+        method = "mr13"
     if bpsw and all(_is_strong_prp(N, b) for b in bases):
-        rec.update(v="prp", method="bpsw", res64=res64, sprp=bases)
+        rec.update(v="prp", method=method, res64=res64, sprp=bases)
     else:
-        rec.update(v="composite", method="bpsw", res64=res64)
+        rec.update(v="composite", method=method, res64=res64)
     return rec
 
 
@@ -149,29 +155,42 @@ def run_unit(fam: Family, uid: str, fp: str, login: str, progress=print, partial
     cands = candidates(fam, uid)
     base = worker_base(fp, uid)
     done: list[dict] = []
+    saved: dict = {}
     if partial_path and Path(partial_path).exists():
         import json  # noqa: PLC0415
 
         saved = json.loads(Path(partial_path).read_text())
         if saved.get("unit_id") == uid and saved.get("base") == base and saved.get("worker") == fp:
             done = saved["verdicts"]
+        else:
+            saved = {}
+    if not HAVE_GMPY2 and progress:
+        progress("warning: gmpy2 is not installed; using the pure-Python fallback (about 20x slower, method label 'mr13')")
+    if done and progress:
+        progress(f"resuming from checkpoint: {len(done)}/{len(cands)} lines already done")
+    elapsed_before = saved.get("elapsed_ms", 0) if done else 0
     t0 = time.perf_counter()
     last = t0
-    for i, (n, v) in enumerate(cands):
-        if i < len(done):
-            continue
-        rec = verdict(fam, v, n, base)
-        done.append(rec)
-        if progress:
-            progress(f"{uid} {i + 1}/{len(cands)} n={n} {v}: {rec['v']} ({rec['method']}, {rec['digits']} digits)")
-        if partial_path and time.perf_counter() - last > checkpoint_s:
-            _write_partial(Path(partial_path), uid, base, fp, done)
-            last = time.perf_counter()
+    try:
+        for i, (n, v) in enumerate(cands):
+            if i < len(done):
+                continue
+            rec = verdict(fam, v, n, base)
+            done.append(rec)
+            if progress:
+                progress(f"{uid} {i + 1}/{len(cands)} n={n} {v}: {rec['v']} ({rec['method']}, {rec['digits']} digits)")
+            if partial_path and time.perf_counter() - last > checkpoint_s:
+                _write_partial(Path(partial_path), uid, base, fp, done, elapsed_before + int((time.perf_counter() - t0) * 1000))
+                last = time.perf_counter()
+    except BaseException:
+        if partial_path and done:
+            _write_partial(Path(partial_path), uid, base, fp, done, elapsed_before + int((time.perf_counter() - t0) * 1000))
+        raise
     payload = {
         "schema": "oeis-home/v1/result", "family": fam.id, "family_hash": fam.hash,
         "unit_id": uid, "n_lo": lo, "n_hi": hi, "login": login, "worker": fp,
         "software": software_info(), "base": base, "verdicts": done, "summary": summarize(done),
-        "wall_ms": int((time.perf_counter() - t0) * 1000), "nonce": os.urandom(32).hex(),
+        "wall_ms": elapsed_before + int((time.perf_counter() - t0) * 1000), "nonce": os.urandom(32).hex(),
     }
     canon(payload)  # profile check
     if partial_path and Path(partial_path).exists():
@@ -179,10 +198,10 @@ def run_unit(fam: Family, uid: str, fp: str, login: str, progress=print, partial
     return payload
 
 
-def _write_partial(path: Path, uid: str, base: int, fp: str, verdicts: list[dict]) -> None:
+def _write_partial(path: Path, uid: str, base: int, fp: str, verdicts: list[dict], elapsed_ms: int = 0) -> None:
     import json  # noqa: PLC0415
 
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"unit_id": uid, "base": base, "worker": fp, "verdicts": verdicts}))
+    tmp.write_text(json.dumps({"unit_id": uid, "base": base, "worker": fp, "verdicts": verdicts, "elapsed_ms": elapsed_ms}))
     os.replace(tmp, path)

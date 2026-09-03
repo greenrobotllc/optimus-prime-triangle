@@ -39,13 +39,29 @@ def file_first_merge(repo_path: Path, rel_path: str) -> dict:
 
 def changed_files(repo_path: Path, base: str, head: str) -> list[tuple[str, str]]:
     """``[(status, path)]`` between two commits (``A`` added, ``M`` modified, ``D`` deleted, ``R`` renamed)."""
-    out = subprocess.run(["git", "-C", str(repo_path), "diff", "--name-status", f"{base}..{head}"],
+    out = subprocess.run(["git", "-C", str(repo_path), "diff", "--name-status", f"{base}...{head}"],   # merge-base diff
                          capture_output=True, text=True, check=True).stdout.strip().splitlines()
     rows = []
     for line in out:
         parts = line.split("\t")
         rows.append((parts[0][0], parts[-1]))
     return rows
+
+
+def pr_for_commit(repo: str, sha: str, token: str | None = None) -> dict:
+    """The pull request that introduced ``sha`` on the default branch (``{}`` if none / offline)."""
+    if not sha:
+        return {}
+    try:
+        rows = _get_json(f"https://api.github.com/repos/{repo}/commits/{sha}/pulls", token)
+    except Exception:  # noqa: BLE001 - offline or no token: caller falls back to commit time
+        return {}
+    merged = [r for r in rows if r.get("merged_at")] or rows
+    if not merged:
+        return {}
+    r = merged[0]
+    return {"pr_number": int(r["number"]), "pr_created_at": r["created_at"], "author_login": r["user"]["login"].lower(),
+            "author_id": int(r["user"]["id"])}
 
 
 def fetch_ledger(raw_url: str) -> dict:

@@ -1,5 +1,5 @@
 {
- "built_at": "2026-09-03 21:38 UTC",
+ "built_at": "2026-09-03 22:38 UTC",
  "counts": {
   "open": 590,
   "claimed": 0,
@@ -9,11 +9,12 @@
   "disputed": 0,
   "invalid": 0
  },
- "verified_through": 0,
+ "verified_through": 131,
  "positive_claims": [
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 20,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -25,7 +26,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 21,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -37,7 +39,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 21,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -49,7 +52,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 22,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -61,7 +65,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 23,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -73,7 +78,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 23,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -85,7 +91,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 25,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -97,7 +104,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 27,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -109,7 +117,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 28,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -121,7 +130,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 30,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -133,7 +143,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 33,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -145,7 +156,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 33,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -157,7 +169,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 38,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -169,7 +182,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 40,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -181,7 +195,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 42,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -193,7 +208,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 46,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -205,7 +221,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 48,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -217,7 +234,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 50,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -229,7 +247,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 50,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -241,7 +260,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 53,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -253,7 +273,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 54,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -265,7 +286,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 56,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -277,7 +299,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 61,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -289,7 +312,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 62,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -301,7 +325,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 65,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -313,7 +338,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 70,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -325,7 +351,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 70,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -337,7 +364,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 75,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -349,7 +377,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 79,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -361,7 +390,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 87,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -373,7 +403,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 93,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -385,7 +416,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 100,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -397,7 +429,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 107,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -409,7 +442,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 107,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -421,7 +455,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 108,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -433,7 +468,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 114,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -445,7 +481,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 119,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -457,7 +494,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 120,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -469,7 +507,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 133,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -481,7 +520,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 149,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -493,7 +533,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 154,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -505,7 +546,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 157,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -517,7 +559,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 172,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -529,7 +572,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 193,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -541,7 +585,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 194,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -553,7 +598,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 207,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -565,7 +611,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 220,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -577,7 +624,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 234,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -589,7 +637,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 250,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -601,7 +650,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 268,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -613,7 +663,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 288,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -625,7 +676,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 301,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -637,7 +689,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 321,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -649,7 +702,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 328,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -661,7 +715,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 343,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -673,7 +728,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 357,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -685,7 +741,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 369,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -697,7 +754,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 371,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -709,7 +767,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 403,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -721,7 +780,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 433,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -733,7 +793,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 461,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -745,7 +806,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 551,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -757,7 +819,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 567,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -769,7 +832,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 590,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -781,7 +845,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 622,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -793,7 +858,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 624,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -805,7 +871,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 633,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -817,7 +884,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 704,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -829,7 +897,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 786,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -841,7 +910,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1028,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -853,7 +923,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1294,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -865,7 +936,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1294,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -877,7 +949,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1301,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -889,7 +962,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1305,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -901,7 +975,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1329,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -913,7 +988,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1356,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -925,7 +1001,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1825,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -937,7 +1014,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 1881,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -949,7 +1027,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 2026,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -961,7 +1040,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 2326,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -973,7 +1053,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 2437,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -985,7 +1066,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 2638,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -997,7 +1079,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 2695,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -1009,7 +1092,8 @@
   },
   {
    "cert_sha256": "",
-   "ci_confirmed": true,
+   "ci_confirmed": false,
+   "ci_run_id": "local",
    "digits": 2728,
    "discovered_at": "2026-09-03T17:33:08-04:00",
    "discoverer_login": "andytriboletti",
@@ -1026,6 +1110,14 @@
    "role": "worker",
    "units_verified": 4,
    "first_finds": 4,
+   "double_checks": 0,
+   "invalid": 0
+  },
+  "ext-oeis-home-bot": {
+   "display_name": "OEIS@home rebuild bot",
+   "role": "bot",
+   "units_verified": 0,
+   "first_finds": 0,
    "double_checks": 0,
    "invalid": 0
   }

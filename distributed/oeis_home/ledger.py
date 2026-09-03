@@ -1,13 +1,20 @@
 """Unit states, credits and the ledger built from ``verified/`` records."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from .families import Family
 from .units import all_units
 
 STATES = ("open", "claimed", "pending", "verified", "double_checked", "disputed", "invalid")
+
+
+def identity(result: dict) -> str:
+    """One identity per GitHub account; a verifier-role key is its own identity, distinct from workers."""
+    if result.get("role") == "verifier":
+        return f"verifier:{result['login']}"
+    gid = result.get("github_id", 0)
+    return f"gh:{gid}" if gid else f"login:{result['login']}"
 
 
 def unit_state(unit_rec: dict) -> str:
@@ -21,34 +28,73 @@ def unit_state(unit_rec: dict) -> str:
         return "claimed" if unit_rec.get("claims") else "open"
     if not unit_rec.get("filtered_checked", {}).get("ok"):
         return "pending"
-    ids = {r.get("github_id") for r in valid if r.get("github_id", 0) != 0} | {r["login"] for r in valid if r.get("role") == "verifier"}
-    return "double_checked" if len(ids) >= 2 else "verified"
+    ids = {identity(r) for r in valid}
+    return "double_checked" if len(valid) >= 2 and len(ids) >= 2 else "verified"
 
 
-def _load_verified(repo: Path) -> dict[str, dict]:
+def trusted_signers(contributors: dict[str, dict], roles: tuple[str, ...]) -> set[str]:
+    return {c["fingerprint"] for c in contributors.values() if c.get("role") in roles}
+
+
+def load_verified(repo: Path, contributors: dict[str, dict], allow_unsigned: bool = False) -> dict[str, dict]:
+    """Verified records signed by a registered ``bot`` key.  Unsigned records are accepted only when
+    ``allow_unsigned`` (local runs) and are marked ``unsigned``; anything else is ignored."""
+    from .canon import CanonError, check_file_bytes  # noqa: PLC0415
+    from .keys import SignatureError, verify_envelope  # noqa: PLC0415
+
+    bots = trusted_signers(contributors, ("bot",))
     out = {}
-    for path in sorted((repo / "distributed" / "verified" / "lehmer-q2").glob("*.json")):
+    vdir = repo / "distributed" / "verified" / "lehmer-q2"
+    for path in sorted(vdir.glob("*.json")) if vdir.exists() else []:
         if path.name.endswith(".pari.json"):
             continue
-        env = json.loads(path.read_text(encoding="utf-8"))
-        payload = env.get("payload", env)
+        try:
+            data = path.read_bytes()
+            env = check_file_bytes(data)
+            if env.get("signature") is None:
+                if not allow_unsigned:
+                    continue
+                payload = dict(env["payload"])
+                payload["unsigned"] = True
+            else:
+                fp = verify_envelope(env, "verified")
+                if fp not in bots:
+                    continue
+                payload = dict(env["payload"])
+                payload["unsigned"] = False
+        except (CanonError, SignatureError, OSError, KeyError, TypeError, ValueError):
+            continue
         out[payload["unit_id"]] = payload
     return out
 
 
-def _load_pari_notes(repo: Path) -> dict[tuple[str, int, str], str]:
+def load_pari_notes(repo: Path, contributors: dict[str, dict]) -> dict[tuple[str, int, str], str]:
+    """Maintainer ``gp`` checks: envelopes of kind ``note`` signed by a registered verifier/bot key."""
+    from .canon import CanonError, check_file_bytes  # noqa: PLC0415
+    from .keys import SignatureError, verify_envelope  # noqa: PLC0415
+
+    signers = trusted_signers(contributors, ("verifier", "bot"))
     out = {}
-    for path in sorted((repo / "distributed" / "verified" / "lehmer-q2").glob("*.pari.json")):
-        for note in json.loads(path.read_text(encoding="utf-8")):
-            out[(note["unit_id"], note["n"], note["variant"])] = note["result"]
+    vdir = repo / "distributed" / "verified" / "lehmer-q2"
+    for path in sorted(vdir.glob("*.pari.json")) if vdir.exists() else []:
+        try:
+            env = check_file_bytes(path.read_bytes())
+            if verify_envelope(env, "note") not in signers:
+                continue
+            for note in env["payload"]["notes"]:
+                if note.get("result") in ("isprime", "ispseudoprime", "composite"):
+                    out[(note["unit_id"], int(note["n"]), note["variant"])] = note["result"]
+        except (CanonError, SignatureError, OSError, KeyError, TypeError, ValueError):
+            continue
     return out
 
 
-def build(repo: Path, fam: Family, contributors: dict[str, dict], claims: dict[str, list[str]] | None = None) -> dict:
+def build(repo: Path, fam: Family, contributors: dict[str, dict], claims: dict[str, list[str]] | None = None,
+          allow_unsigned: bool = False) -> dict:
     """Assemble ``ledger/lehmer-q2.json`` from the verified records and contributors."""
     repo = Path(repo)
-    verified = _load_verified(repo)
-    pari = _load_pari_notes(repo)
+    verified = load_verified(repo, contributors, allow_unsigned=allow_unsigned)
+    pari = load_pari_notes(repo, contributors)
     claims = claims or {}
     units: dict[str, dict] = {}
     positive: list[dict] = []
@@ -61,19 +107,33 @@ def build(repo: Path, fam: Family, contributors: dict[str, dict], claims: dict[s
             r.setdefault("github_id", c.get("github_id", 0))
             r.setdefault("role", c.get("role", "worker"))
         rec["state"] = unit_state(rec)
+        enriched = []
         for pc in rec.get("positive_claims", []):
             pc = dict(pc)
-            pc["maintainer_pari"] = pari.get((uid, pc["n"], pc["variant"]), pc.get("maintainer_pari", "none"))
+            pc["maintainer_pari"] = pari.get((uid, pc["n"], pc["variant"]), "none")
             pc["unit_id"] = uid
-            positive.append(pc)
+            enriched.append(pc)
+        rec["positive_claims"] = enriched
+        positive.extend(enriched)
         units[uid] = rec
+    # verified_through by index: every verdict below it is final (composite / unit / deterministic prime,
+    # or a prp that has a second identity and a maintainer gp check) inside a verified unit
     verified_through = 0
     for uid in all_units(fam.n_max_open, fam.bands):
         u = units[uid]
-        ok = u["state"] in ("verified", "double_checked") and u.get("filtered_checked", {}).get("ok")
-        ok = ok and all(pc.get("verifier_login") and pc.get("ci_confirmed") and pc.get("maintainer_pari", "none") != "none"
-                        for pc in positive if pc["unit_id"] == uid)
-        if not ok:
+        if u["state"] not in ("verified", "double_checked") or not u.get("filtered_checked", {}).get("ok") or u.get("unsigned"):
+            break
+        claims_by_key = {(pc["n"], pc["variant"]): pc for pc in u["positive_claims"]}
+        stop = None
+        for rec in sorted(u.get("verdicts", []), key=lambda r: (r["n"], r["variant"])):
+            if rec["v"] != "prp":
+                continue
+            pc = claims_by_key.get((rec["n"], rec["variant"]), {})
+            if not (pc.get("verifier_login") and pc.get("ci_confirmed") and pc.get("maintainer_pari", "none") in ("isprime", "ispseudoprime")):
+                stop = rec["n"]
+                break
+        if stop is not None:
+            verified_through = max(verified_through, stop)
             break
         verified_through = u.get("n_hi", verified_through)
     stats: dict[str, dict] = {}
