@@ -23,7 +23,7 @@ def test_figure_has_expected_trace_names():
     fig = pl.build_star_figure(build_star(), points, plaus, ll, set(KNOWN_MERSENNE_EXPONENTS), {11: 23})
     names = {tr.name for tr in fig.data}
     expected = {"star_vertices", "star_edges", "golden_triangles", "pentagram_intersections", "golden_spiral",
-                "candidates", "known_mersenne_primes"}
+                "candidates", "known_mersenne_primes", "mersenne_triangle", "neighbours"}
     expected |= {f"ring_{k}" for k in cfg.RING_RADII} | {f"golden_ring_{n}" for n in cfg.GOLDEN_RINGS}
     assert expected <= names
     cand = next(tr for tr in fig.data if tr.name == "candidates")

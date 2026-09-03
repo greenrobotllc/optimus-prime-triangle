@@ -39,7 +39,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--research", action="store_true", help="run the research dashboards and update the ledger")
     ap.add_argument("--out", type=Path, default=cfg.OUTPUT_DIR)
     ap.add_argument("--seed", type=int, default=cfg.SEED)
-    ap.add_argument("--layout", choices=("octagon_crown", "stella_octangula"), default=cfg.STAR_LAYOUT)
+    ap.add_argument("--layout", choices=cfg.STAR_LAYOUTS, default=cfg.STAR_LAYOUT)
     return ap.parse_args(argv)
 
 

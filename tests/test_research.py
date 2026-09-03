@@ -163,7 +163,11 @@ def test_ledger_round_trip_and_label(tmp_path):
                                                 "golden-seed", "lehmer-identification", "qps-is-lucas-lehmer", "mersenne-fibonacci-rank"}
     assert all(isinstance(e.references, list) for e in reloaded.entries)
     assert not any(e.kind == "anomaly" for e in ledger.entries)
-    assert {e.novelty for e in ledger.entries} <= {"unchecked", "classical"}
+    assert {e.novelty for e in ledger.entries} <= {"unchecked", "classical", "corollary_of_known", "checked"}
+    by = {e.slug: e for e in ledger.entries}
+    assert by["periodicity-classification"].novelty == "classical" and by["periodicity-classification"].references
+    assert by["qps-closed-form"].novelty == "unchecked" and "not in" in by["qps-closed-form"].novelty_note.lower()
+    assert "2026-09-02" in by["lehmer-identification"].novelty_note
 
 
 def test_lean_export_produces_skeletons():

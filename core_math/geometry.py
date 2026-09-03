@@ -10,25 +10,35 @@ vertex angles ``36°, 72°, 108°`` are exactly the pentagram / golden-triangle 
 exponents other than 2 and 5 land on the eight *odd* multiples of 18° that are coprime to
 20 (``3p mod 20`` is a unit when ``gcd(p, 20) = 1``).
 
-Interpretive part (documented as such)
---------------------------------------
-The full text of Ibrahim's "Mersenne Star" paper (DOI 10.1080/25765299.2025.2569155)
-is not accessible; only its abstract is (8 vertices, 12 edges, 32 relationships, satellite
-points at Fibonacci/Lucas values and periods 6/8/12/24).  The star built here is therefore
-an *interpretation*:
+The Mersenne Star of the source paper (now read in full)
+------------------------------------------------------
+Ibrahim, "The emergence of the Mersenne Star" (HAL hal-05035758v2, DOI
+10.1080/25765299.2025.2569155) defines everything in the ``(ζ, ξ)`` parameter plane of the
+Quanta Prime Sequence ``Ω_r(k | ζ, ξ | n)``:
 
-* ``octagon_crown`` — 8 vertices at ``(cos 45°k, sin 45°k, Ψ(1, 0, k))``: the Eight Levels
-  drawn as heights over the period-8 ring; 12 edges = 8 rim edges + 4 diameters.
-* ``stella_octangula`` — the 8 vertices ``(±1, ±1, ±1)``, two interpenetrating tetrahedra
-  (split by bit parity), 12 edges.
+* the **Mersenne Triangle** is the three points ``A = (0, −1)``, ``B = (−2, −5)``, ``C = (1, 4)``
+  (Theorem 7.1: ``M_p`` prime iff ``Ω_0(n/2|0,−1|n)·Ω_0(⌊p/2⌋|−2,−5|p)`` divides
+  ``Ω_0(n/2|1,4|n)·Ω_0(⌊p/2⌋|0,−1|p)``, ``n = 2^{p−1}`` — which is the Lucas–Lehmer test);
+* the **Mersenne Star** is the eight points ``A(0,−1), B(−2,−5), C(1,4), F(−1,4), G(1,−4),
+  H(2,5), I(−1,−4), J(0,1)`` (Tables 1 and 3); its twelve edges, drawn in Figure 1 but never
+  listed in the text, join each of the six off-axis points to both axis points ``A`` and ``J``
+  (the complete bipartite graph ``K_{2,6}``); the "32 relationships" are Theorem 7.6, the
+  sign-symmetric variants of Theorem 7.1, all equivalent to Lucas–Lehmer;
+* the **neighbours** (Table 1) are the parameter points ``(1,3)``, ``(−1,−3)`` (Lucas),
+  ``(1,−3)`` (Fibonacci/Lucas mix) and the periodic points ``(1,1), (1,0), (1,−1), (1,√2),
+  (1,φ−1), (1,√3)`` with periods 6, 8, 12, 16, 20, 24.
 
-Satellite rings for periods 6, 12, 16, 20, 24 and the four golden rings surround it; a
-pentagram with its five golden triangles is inscribed in the period-20 ring, and the
-"golden triangle intersections" are the inner pentagon vertices at radius ``R/φ²``.
+The Mersenne Triangle is not a golden triangle (its angles are ≈ 2.7°, 3.1°, 174.2°), and the
+paper contains no pentagram or golden triangle.  Layout ``"paper_parameter_plane"`` reproduces
+the paper exactly (points in the plane ``z = 0``); the two earlier layouts ``"octagon_crown"``
+and ``"stella_octangula"`` are kept as labelled interpretations from before the text was
+available.  The golden decorations requested by the project brief (rotation rings, pentagram,
+golden triangles, spiral) are drawn on a separate plane ``z = DECORATION_Z`` and are *not*
+part of the paper's construction.
 
-Candidate exponents are placed at angle ``54°·p`` (their own period-20 node), radius
-``R₂₀·(1 + frac(log_φ p))`` (so numbers close to a power of φ — Lucas numbers — sit on the
-inner edge: the "φ-convergence zone") and height ``∝ log₂ p``.  All proximity metrics
+Candidate exponents are placed on the period-20 ring at angle ``54°·p`` (their own period-20
+node), radius ``R₂₀·(1 + frac(log_φ p))`` (numbers close to a power of φ — Lucas numbers — sit
+on the inner edge: the "φ-convergence zone") and height ``∝ log₂ p``.  All proximity metrics
 are dimensionless numbers in ``[0, 1]``; they are *coordinates*, not evidence of primality.
 """
 from __future__ import annotations
@@ -62,12 +72,38 @@ class ExponentPoint:
     r_octave: float
 
 
+#: The paper's Mersenne Star: label -> (ζ, ξ) in the QPS parameter plane (Tables 1 and 3).
+PAPER_STAR_VERTICES: dict[str, tuple[int, int]] = {
+    "A": (0, -1), "B": (-2, -5), "C": (1, 4), "F": (-1, 4), "G": (1, -4), "H": (2, 5), "I": (-1, -4), "J": (0, 1),
+}
+PAPER_STAR_ORDER: tuple[str, ...] = tuple(PAPER_STAR_VERTICES)
+#: Twelve edges decoded from Figure 1: both axis points A, J joined to every off-axis point (K_{2,6}).
+PAPER_STAR_EDGES: tuple[tuple[str, str], ...] = tuple((axis, other) for axis in ("A", "J") for other in ("B", "H", "C", "F", "G", "I"))
+#: The Mersenne Triangle (Theorem 7.1, Figure 4).
+PAPER_TRIANGLE: dict[str, tuple[int, int]] = {"A": (0, -1), "B": (-2, -5), "C": (1, 4)}
+#: Neighbour points of Table 1: label -> ((ζ, ξ), description).
+PAPER_NEIGHBOURS: dict[str, tuple[tuple[float, float], str]] = {
+    "L1": ((1, 3), "Lucas numbers"),
+    "L2": ((-1, -3), "Lucas numbers"),
+    "Mix": ((1, -3), "Fibonacci / Lucas mix"),
+    "P6": ((1, 1), "period 6"),
+    "P8": ((1, 0), "period 8 (Eight Levels)"),
+    "P12": ((1, -1), "period 12"),
+    "P16": ((1, math.sqrt(2)), "period 16"),
+    "P20": ((1, PHI - 1), "period 20 (golden ratio)"),
+    "P24": ((1, math.sqrt(3)), "period 24"),
+}
+
+
 @dataclass
 class StarGeometry:
     layout: str
     vertices: np.ndarray                      # (8, 3)
     edges: list[tuple[int, int]]              # 12 pairs
     vertex_levels: np.ndarray                 # (8,)
+    vertex_labels: list[str] = field(default_factory=list)
+    triangle: np.ndarray | None = None                                 # (3, 3) the Mersenne Triangle (paper layout)
+    neighbours: dict[str, tuple[np.ndarray, str]] = field(default_factory=dict)   # label -> (point, description)
     rings: dict[int, np.ndarray] = field(default_factory=dict)         # period -> (k, 3)
     golden_rings: dict[str, np.ndarray] = field(default_factory=dict)  # name -> (k, 3)
     pentagram_outer: np.ndarray | None = None                          # (5, 3)
@@ -153,6 +189,8 @@ def ring_nodes(period: int, radius: float, z: float = 0.0, phase_deg: float = 0.
 
 # --------------------------------------------------------------------------- the star
 def star_vertices(layout: str = cfg.STAR_LAYOUT, height_scale: float = 0.5) -> np.ndarray:
+    if layout == "paper_parameter_plane":
+        return np.array([[*PAPER_STAR_VERTICES[k], 0.0] for k in PAPER_STAR_ORDER], dtype=float)
     if layout == "octagon_crown":
         ang = np.radians(45.0 * np.arange(8))
         return np.column_stack([np.cos(ang), np.sin(ang), height_scale * np.array(EIGHT_LEVELS, dtype=float)])
@@ -162,6 +200,9 @@ def star_vertices(layout: str = cfg.STAR_LAYOUT, height_scale: float = 0.5) -> n
 
 
 def star_edges(layout: str = cfg.STAR_LAYOUT) -> list[tuple[int, int]]:
+    if layout == "paper_parameter_plane":
+        idx = {k: i for i, k in enumerate(PAPER_STAR_ORDER)}
+        return [(idx[a], idx[b]) for a, b in PAPER_STAR_EDGES]
     if layout == "octagon_crown":
         rim = [(k, (k + 1) % 8) for k in range(8)]
         diameters = [(k, k + 4) for k in range(4)]
@@ -180,23 +221,34 @@ def star_edges(layout: str = cfg.STAR_LAYOUT) -> list[tuple[int, int]]:
 
 def build_star(layout: str = cfg.STAR_LAYOUT) -> StarGeometry:
     """Assemble the star, its satellite rings, the pentagram and the golden triangles."""
+    paper = layout == "paper_parameter_plane"
     star = StarGeometry(
         layout=layout,
         vertices=star_vertices(layout),
         edges=star_edges(layout),
-        vertex_levels=np.array(EIGHT_LEVELS, dtype=float),
+        vertex_levels=np.zeros(8) if paper else np.array(EIGHT_LEVELS, dtype=float),
+        vertex_labels=list(PAPER_STAR_ORDER) if paper else [f"L={l}" for l in EIGHT_LEVELS],
     )
+    if paper:
+        star.triangle = np.array([[*PAPER_TRIANGLE[k], 0.0] for k in ("A", "B", "C")], dtype=float)
+        star.neighbours = {name: (np.array([pt[0], pt[1], 0.0]), desc) for name, (pt, desc) in PAPER_NEIGHBOURS.items()}
+    z0 = cfg.DECORATION_Z if paper else 0.0
     for period, radius in cfg.RING_RADII.items():
-        star.rings[period] = ring_nodes(period, radius, cfg.RING_Z[period])
+        star.rings[period] = ring_nodes(period, radius, z0 + cfg.RING_Z[period])
     for i, (name, (_, _, period)) in enumerate(cfg.GOLDEN_RINGS.items()):
         star.golden_rings[name] = ring_nodes(period, cfg.GOLDEN_RING_RADIUS * (1 + 0.06 * i),
-                                             cfg.GOLDEN_RING_Z + 0.1 * (i + 1))
-    outer, inner = pentagram(cfg.GOLDEN_RING_RADIUS, cfg.GOLDEN_RING_Z)
+                                             z0 + cfg.GOLDEN_RING_Z + 0.1 * (i + 1))
+    outer, inner = pentagram(cfg.GOLDEN_RING_RADIUS, z0 + cfg.GOLDEN_RING_Z)
     star.pentagram_outer = outer
     star.intersections = inner
-    star.golden_triangles = golden_triangles_in_pentagram(cfg.GOLDEN_RING_RADIUS, cfg.GOLDEN_RING_Z)
-    star.spiral = golden_spiral(cfg.SPIRAL_TURNS, z=cfg.GOLDEN_RING_Z)
+    star.golden_triangles = golden_triangles_in_pentagram(cfg.GOLDEN_RING_RADIUS, z0 + cfg.GOLDEN_RING_Z)
+    star.spiral = golden_spiral(cfg.SPIRAL_TURNS, z=z0 + cfg.GOLDEN_RING_Z)
     return star
+
+
+def mersenne_triangle_angles_deg() -> tuple[float, float, float]:
+    """Interior angles of the paper's Mersenne Triangle A(0,−1), B(−2,−5), C(1,4) — not golden."""
+    return triangle_angles_deg(np.array([[*PAPER_TRIANGLE[k]] for k in ("A", "B", "C")], dtype=float))
 
 
 # --------------------------------------------------------------------------- exponent placement

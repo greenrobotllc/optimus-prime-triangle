@@ -55,8 +55,26 @@ def test_pentagram_inner_radius_is_R_over_phi_squared_and_triangles_are_golden()
         assert np.allclose(sorted(g.triangle_angles_deg(tri)), [36.0, 72.0, 72.0])
 
 
-def test_star_has_8_vertices_12_edges_both_layouts():
-    for layout in ("octagon_crown", "stella_octangula"):
+def test_paper_star_matches_the_source():
+    star = g.build_star("paper_parameter_plane")
+    assert star.vertex_labels == ["A", "B", "C", "F", "G", "H", "I", "J"]
+    assert star.vertices[:, 2].tolist() == [0.0] * 8
+    assert [tuple(int(v) for v in row[:2]) for row in star.vertices] == [(0, -1), (-2, -5), (1, 4), (-1, 4), (1, -4), (2, 5), (-1, -4), (0, 1)]
+    # K_{2,6}: A and J each joined to the six off-axis points, no other edges
+    a, j = 0, 7
+    assert all(i in (a, j) for i, _ in star.edges) and len(star.edges) == 12
+    assert set(k for _, k in star.edges) == {1, 2, 3, 4, 5, 6}
+    assert star.triangle is not None and star.triangle.shape == (3, 3)
+    assert set(star.neighbours) == {"L1", "L2", "Mix", "P6", "P8", "P12", "P16", "P20", "P24"}
+    assert math.isclose(star.neighbours["P20"][0][1], cfg.PHI - 1)
+    angles = sorted(g.mersenne_triangle_angles_deg())
+    assert angles[2] > 160.0 and angles[0] < 10.0    # nearly degenerate (≈ 5°, 10°, 165°), not 36°–72°–72°
+    # decorations sit on the separate plane
+    assert all(star.rings[k][0, 2] < 0 for k in star.rings)
+
+
+def test_star_has_8_vertices_12_edges_all_layouts():
+    for layout in cfg.STAR_LAYOUTS:
         star = g.build_star(layout)
         assert star.vertices.shape == (8, 3)
         assert len(star.edges) == 12 and len(set(map(frozenset, star.edges))) == 12

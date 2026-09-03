@@ -26,6 +26,7 @@ exponential in ``p`` and is only offered for ``p ≤ 13`` as a verification of t
 """
 from __future__ import annotations
 
+import math
 from fractions import Fraction
 
 from core_math.psi_sequence import delta
@@ -119,3 +120,109 @@ def qps_primality(p: int) -> bool:
     if a.denominator != 1 or b.denominator != 1:
         raise ArithmeticError("QPS ratios must be integers")
     return int(b) % int(a) == 0
+
+
+# --------------------------------------------------------------------------- closed forms for the whole table
+# The following identities were found in this repository (2026-09-02) and are not stated in the
+# QPS paper, which gives explicit Ω formulas only at the three points (1, −2), (1, 2), (0, −1).
+# They are elementary (binomial sums / a terminating ₂F₁ / Gegenbauer polynomials) and are
+# proved by induction on k; see tests/test_qps.py for the exact verification ranges.
+# Notation: x^{m↓} = x (x − 1) ⋯ (x − m + 1) is the falling factorial.
+
+def falling(x: int, length: int) -> int:
+    """``x (x − 1) ⋯ (x − length + 1)``; empty product = 1."""
+    out = 1
+    for i in range(length):
+        out *= x - i
+    return out
+
+
+def double_falling(u: int, j: int) -> int:
+    """``u (u − 2) (u − 4) ⋯ (u − 2j + 2)``; empty product = 1."""
+    out = 1
+    for i in range(j):
+        out *= u - 2 * i
+    return out
+
+
+def omega_closed_form(r: int, k: int, zeta: int, xi: int, n: int) -> int:
+    """Closed form for the whole QPS table (valid for all ``n ≥ 1``, ``r, k ≥ 0``)::
+
+        Ω_r(k | ζ, ξ | n) = Σ_{j=0}^{k} C(k, j) (2ζ − ξ)^{k−j} (−2ζ)^j · (N−j−1)^{^{k−j↓}} · u(u−2)⋯(u−2j+2)
+
+    with ``N = n − r`` and ``u = n − 2r − δ(n−1)``.  In particular Ω depends on ``(n, r)`` only
+    through ``(N, u)``, which yields the shift identity :func:`omega_shift_holds`.
+    """
+    N = n - r
+    u = n - 2 * r - delta(n - 1)
+    c = 2 * zeta - xi
+    return sum(math.comb(k, j) * c ** (k - j) * (-2 * zeta) ** j * falling(N - j - 1, k - j) * double_falling(u, j)
+               for j in range(k + 1))
+
+
+def _pochhammer(x: Fraction, j: int) -> Fraction:
+    out = Fraction(1)
+    for i in range(j):
+        out *= x + i
+    return out
+
+
+def omega_hypergeometric(r: int, k: int, zeta: int, xi: int, n: int) -> Fraction:
+    """Terminating ``₂F₁`` form (needs ``2ζ ≠ ξ`` and ``k ≤ n − r − 1``)::
+
+        Ω_r(k) = (2ζ − ξ)^k (N−1)^{k↓} · ₂F₁(−k, −u/2; 1 − N; 4ζ/(2ζ − ξ)).
+    """
+    N = n - r
+    u = n - 2 * r - delta(n - 1)
+    c = 2 * zeta - xi
+    if c == 0 or k > N - 1:
+        raise ValueError("hypergeometric form needs 2ζ ≠ ξ and k ≤ n − r − 1")
+    z = Fraction(4 * zeta, c)
+    total = Fraction(0)
+    for j in range(k + 1):
+        total += _pochhammer(Fraction(-k), j) * _pochhammer(Fraction(-u, 2), j) / (_pochhammer(Fraction(1 - N), j) * math.factorial(j)) * z ** j
+    return c ** k * falling(N - 1, k) * total
+
+
+def omega_column_delta_explicit(k: int, zeta: int, xi: int, n: int) -> Fraction:
+    """The column ``r = δ(n)`` as a polynomial in ``ζ²`` and ``ξ`` (``K = ⌊n/2⌋``, ``0 ≤ k ≤ K``)::
+
+        Ω_{δ(n)}(k) = (−1)^k (2K−1)^{k↓} Σ_{i=0}^{⌊k/2⌋} C(k, 2i) (2i)! / (i! (K−1)^{i↓}) (−ζ²)^i ξ^{k−2i}.
+
+    Consequence (parity law): ``Ω_{δ(n)}(k | ζ, −ξ | n) = (−1)^k Ω_{δ(n)}(k | ζ, ξ | n)``.
+    """
+    K = n // 2
+    total = Fraction(0)
+    for i in range(k // 2 + 1):
+        total += Fraction(math.comb(k, 2 * i) * math.factorial(2 * i), math.factorial(i) * falling(K - 1, i)) * (-zeta * zeta) ** i * xi ** (k - 2 * i)
+    return (-1) ** k * falling(2 * K - 1, k) * total
+
+
+def omega_gegenbauer(k: int, zeta: int, xi: int, n: int):
+    """Gegenbauer form of the ``r = δ(n)`` column for ``1 ≤ k ≤ K − 1`` (sympy)::
+
+        Ω_{δ(n)}(k) = (−ζ)^k k! (2K−1)^{k↓} / (K−1)^{k↓} · C_k^{(K−k)}(ξ / 2ζ).
+    """
+    import sympy as sp
+
+    K = n // 2
+    if not 1 <= k <= K - 1 or zeta == 0:
+        raise ValueError("Gegenbauer form is stated for 1 ≤ k ≤ K − 1 and ζ ≠ 0")
+    value = (-zeta) ** k * sp.factorial(k) * sp.Rational(falling(2 * K - 1, k), falling(K - 1, k)) * sp.gegenbauer(k, K - k, sp.Rational(xi, 2 * zeta))
+    return sp.nsimplify(sp.expand(value))
+
+
+def omega_shift_holds(n: int, zeta: int, xi: int) -> bool:
+    """Shift identity: for odd ``n``, ``Ω_{r+1}(k | n) = Ω_r(k | n − 1)`` for all ``r, k``."""
+    if n % 2 == 0:
+        raise ValueError("the shift identity is stated for odd n")
+    K = n // 2
+    return all(omega(r + 1, k, zeta, xi, n) == omega(r, k, zeta, xi, n - 1)
+               for k in range(K + 1) for r in range(K - k + 2))
+
+
+def star_even_symmetry_holds(n: int) -> bool:
+    """Lemma 7.4 of the Mersenne Star paper, ``Ω_0(⌊n/2⌋|−1,4|n) = Ω_0(⌊n/2⌋|1,4|n) = Ω_0(⌊n/2⌋|1,−4|n)``,
+    is stated for ``8 | n`` but holds exactly for all ``4 | n`` (and ``n = 1``)."""
+    K = n // 2
+    return omega(0, K, -1, 4, n) == omega(0, K, 1, 4, n) == omega(0, K, 1, -4, n)

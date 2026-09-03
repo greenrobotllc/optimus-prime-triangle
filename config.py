@@ -49,7 +49,9 @@ GOLDEN_RINGS: dict[str, tuple[float, float, int]] = {
 EIGHT_LEVELS: tuple[int, ...] = (2, 1, 0, -1, -2, -1, 0, 1)
 
 # --------------------------------------------------------------------------- star geometry
-STAR_LAYOUT: str = "octagon_crown"          # or "stella_octangula"
+STAR_LAYOUTS: tuple[str, ...] = ("paper_parameter_plane", "octagon_crown", "stella_octangula")
+STAR_LAYOUT: str = "paper_parameter_plane"   # the paper's definition; the other two are earlier interpretations
+DECORATION_Z: float = -2.5                   # z-plane of the golden decorations under the paper star
 RING_RADII: dict[int, float] = {8: 1.0, 6: 1.6, 12: 2.2, 16: 2.8, 20: 3.4, 24: 4.0}
 RING_Z: dict[int, float] = {8: 0.0, 6: 0.3, 12: 0.6, 16: 0.9, 20: 1.2, 24: 1.5}
 GOLDEN_RING_RADIUS: float = RING_RADII[20]

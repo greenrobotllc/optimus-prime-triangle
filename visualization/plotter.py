@@ -50,14 +50,29 @@ def build_star_figure(star: StarGeometry, points: list[ExponentPoint], plausibil
 
     # the star (interpretation — see core_math.geometry)
     V = star.vertices
+    labels = star.vertex_labels or [f"L={int(l)}" for l in star.vertex_levels]
+    paper = star.layout == "paper_parameter_plane"
     fig.add_trace(go.Scatter3d(
         name="star_vertices", x=V[:, 0], y=V[:, 1], z=V[:, 2], mode="markers+text",
-        text=[f"L={int(l)}" for l in star.vertex_levels], textposition="top center",
+        text=labels, textposition="top center",
         marker=dict(size=7, color="#ff7f0e", symbol="circle"),
-        hovertemplate="vertex %{text}<extra>Eight Levels</extra>",
+        hovertemplate=("(ζ, ξ) = (%{x}, %{y})<extra>Mersenne Star vertex %{text}</extra>" if paper
+                       else "vertex %{text}<extra>Eight Levels (interpretation)</extra>"),
     ))
     xs, ys, zs = _segments((V[i], V[j]) for i, j in star.edges)
     fig.add_trace(go.Scatter3d(name="star_edges", x=xs, y=ys, z=zs, mode="lines", line=dict(color="#ff7f0e", width=4), hoverinfo="skip"))
+    if star.triangle is not None:
+        x, y, z = _closed_polygon(star.triangle)
+        fig.add_trace(go.Scatter3d(name="mersenne_triangle", x=x, y=y, z=z, mode="lines",
+                                   line=dict(color="#d62728", width=6),
+                                   hovertemplate="Mersenne Triangle A(0,−1) B(−2,−5) C(1,4) — Theorem 7.1 (= Lucas–Lehmer)<extra></extra>"))
+    if star.neighbours:
+        pts = np.array([v[0] for v in star.neighbours.values()])
+        fig.add_trace(go.Scatter3d(name="neighbours", x=pts[:, 0], y=pts[:, 1], z=pts[:, 2], mode="markers+text",
+                                   text=list(star.neighbours), textposition="bottom center",
+                                   marker=dict(size=5, color="#9467bd", symbol="square"),
+                                   customdata=[v[1] for v in star.neighbours.values()],
+                                   hovertemplate="%{text}: (ζ, ξ) = (%{x:.3f}, %{y:.3f})<br>%{customdata}<extra>neighbour (Table 1)</extra>"))
 
     # satellite rings
     for period, nodes in sorted(star.rings.items()):
@@ -116,8 +131,11 @@ def build_star_figure(star: StarGeometry, points: list[ExponentPoint], plausibil
 
     fig.update_layout(
         template="plotly_dark",
-        title=title or (f"Mersenne Star (interpretation, layout '{star.layout}') — Ψ rotation rings, golden triangles, "
-                        "candidate exponents coloured by siever plausibility"),
+        title=title or ((f"Mersenne Star of Ibrahim (2025) in the QPS parameter plane (ζ, ξ), with the golden decorations of "
+                         "the brief on a lower plane — candidates coloured by siever plausibility")
+                        if paper else
+                        (f"Mersenne Star (interpretation, layout '{star.layout}') — Ψ rotation rings, golden triangles, "
+                         "candidate exponents coloured by siever plausibility")),
         scene=dict(aspectmode="data", xaxis_title="x", yaxis_title="y", zaxis_title="z ∝ log₂ p / ring height"),
         legend=dict(itemsizing="constant"),
         margin=dict(l=0, r=0, t=60, b=0),

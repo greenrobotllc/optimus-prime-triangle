@@ -116,21 +116,31 @@ uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requi
 | `config.py` | every default: candidate range, the Ψ rings and their rotation angles, star layout, siever and research parameters, the discovery label |
 | `core_math/mersenne.py` | Mersenne numbers, Lucas–Lehmer (universal seed 4; golden seed 3 for p ≡ 3 mod 4), trial factoring, Sophie-Germain factors, Wagstaff prior, the table of 52 known exponents |
 | `core_math/psi_sequence.py` | Ibrahim's Ψ-sequence (recurrence, explicit sum, closed form, `O(log n)` modular ladder), exact quadratic-ring arithmetic (`QuadInt`), the periodic ring tables, Theorems 26/27/30 |
-| `core_math/qps.py` | the Quanta Prime Sequence Ω and its Theorems 25, 11, 9 |
+| `core_math/qps.py` | the Quanta Prime Sequence Ω, its Theorems 25, 11, 9, and the closed-form / hypergeometric / Gegenbauer / shift identities found here |
 | `core_math/symbolic_bridge.py` | sympy proofs: homogeneity, differential-operator identities, Chebyshev/Dickson links, the normalisation identity, ring roots, the rotation form |
-| `core_math/geometry.py` | golden triangles, pentagram, the rotation rings, the (interpreted) Mersenne Star, exponent placement and proximity metrics |
+| `core_math/geometry.py` | the paper's Mersenne Star and Triangle in the `(ζ, ξ)` plane, two earlier interpretive layouts, golden triangles / pentagram / rotation rings as decorations, exponent placement and proximity metrics |
 | `ml_models/` | leak-free features, labelled dataset, baselines + logistic + torch MLP, repeated stratified CV with an explicit honesty line |
 | `research/` | growth laws (G1), Monte-Carlo tests of the geometric claims (G1b), New Mersenne Conjecture / Wieferich / Wall–Sun–Sun dashboards (G2–G4), the Fibonacci rank-of-apparition theorem (G4b), the periodicity classification (G7), the discovery census and ledger (G8), text-only Lean export |
 | `visualization/plotter.py` | Plotly `graph_objects` 3-D map with stable trace names; matplotlib period-20 wheel |
-| `tests/` | 124 exact tests; every identity quoted from the papers is checked with integer arithmetic |
+| `tests/` | 132 exact tests; every identity quoted from the papers is checked with integer arithmetic |
 
 ## What the math actually says
 
 The brief's sources are three papers by Moustafa Ibrahim: *Generalizing the Eight Levels Theorem*
 ([arXiv:2404.05772](https://arxiv.org/abs/2404.05772)), *On the Emergence of the Quanta Prime Sequence*
 ([arXiv:2502.06796](https://arxiv.org/abs/2502.06796)) and *The emergence of the Mersenne Star*
-([doi:10.1080/25765299.2025.2569155](https://www.tandfonline.com/doi/full/10.1080/25765299.2025.2569155),
-full text not accessible to us — the star geometry here is a documented interpretation).
+([doi:10.1080/25765299.2025.2569155](https://www.tandfonline.com/doi/full/10.1080/25765299.2025.2569155);
+read from the HAL preprint [hal-05035758v2](https://hal.science/hal-05035758v2)).
+
+* **The Mersenne Star is a set of eight parameter points, not a golden figure.**  In the paper everything
+  lives in the `(ζ, ξ)` parameter plane of the Quanta Prime Sequence `Ω_r(k | ζ, ξ | n)`: the *Mersenne
+  Triangle* is the three points `A(0,−1)`, `B(−2,−5)`, `C(1,4)` (its Theorem 7.1 is the Lucas–Lehmer test),
+  the *Mersenne Star* is the eight points `A, B, C, F(−1,4), G(1,−4), H(2,5), I(−1,−4), J(0,1)`, its twelve edges
+  (drawn but never listed) join `A` and `J` to the six other points, and its "32 relationships" are the
+  sign-symmetric variants of Theorem 7.1 — all equal to Lucas–Lehmer for every `p` tested.  The paper contains
+  no pentagram and no golden triangle; the triangle `ABC` has angles of about 5°, 10° and 165°.  Layout
+  `paper_parameter_plane` (the default) reproduces the paper; the golden decorations the brief asked for are
+  drawn on a separate plane and labelled as such.  Five errata are recorded in the ledger.
 
 * **The Ψ-sequence is D. H. Lehmer's companion sequence (1930).**  Exactly:
   `Ψ(a, b, n) = V̄_n(√(2a − b), a)`, where `V̄_n = V_n` for even `n` and `V_n/√R` for odd `n`,
@@ -167,6 +177,21 @@ full text not accessible to us — the star geometry here is a documented interp
   `s_k = L_{2^{k+1}} = φ^{2^{k+1}} + ψ^{2^{k+1}}` and is valid exactly for `p ≡ 3 (mod 4)`; no seed built
   in `Q(√5)` can be universal because 5 is a quadratic residue mod `M_p` when `p ≡ 1 (mod 4)`.
 
+## New identities for the Quanta Prime Sequence (found here; not in the source)
+
+The QPS paper gives explicit formulas for `Ω_r(k | ζ, ξ | n)` only at three parameter points.  With
+`N = n − r` and `u = n − 2r − δ(n−1)` the whole table has the closed form
+
+    Ω_r(k | ζ, ξ | n) = Σ_{j=0}^{k} C(k, j) (2ζ − ξ)^{k−j} (−2ζ)^j · (N−j−1)(N−j−2)⋯(N−k) · u(u−2)⋯(u−2j+2),
+
+equivalently `(2ζ − ξ)^k (N−1)^{k↓} · ₂F₁(−k, −u/2; 1 − N; 4ζ/(2ζ − ξ))`, with exponential generating
+function `e^{(2ζ−ξ)x} ₁F₁(−u/2; 1 − N; −4ζx)`.  Consequences: `Ω` depends on `(n, r)` only through `(N, u)`, so
+for odd `n` the shift `Ω_{r+1}(k | n) = Ω_r(k | n − 1)` holds; the column `r = δ(n)` is a Gegenbauer column
+`(−ζ)^k k! (2K−1)^{k↓}/(K−1)^{k↓} · C_k^{(K−k)}(ξ/2ζ)` and obeys the parity law `Ω(ζ, −ξ) = (−1)^k Ω(ζ, ξ)`, which
+fails for every other column.  All are proved (induction / standard special-function identities) and checked
+exactly in `tests/test_qps.py`.  They are routine mathematics about a 2025 object; as far as we know they are
+new, and they are the only "new equations" this project can honestly claim.
+
 ## What the siever finds
 
 Repeated stratified cross-validation on p ≤ 2500 (365 prime exponents, 15 positives):
@@ -195,12 +220,52 @@ as a lift over the Wagstaff prior larger than one standard deviation.
 | G7 | periodicity classification | `Ψ(1, −2cos 2θ, n) = 2cos nθ` | `research/periodicity.py`, exact verification |
 | G8 | automated identity discovery | | `research/discovery.py`, ledger, Lean skeletons |
 
-## On naming discoveries
+## Novelty audit and naming
 
-`discoveries/candidates.md` is a ledger with a status ladder
-`numeric-verified → sympy-proved / proved (elementary) → novelty: unchecked | classical | checked`.
-The working label (`config.DISCOVERY_LABEL`, default "Triboletti–Fable") is a *working name*.  Mathematical
-names stick only through publication and citation, and this repository never asserts novelty: the
-normalisation identity is classical in substance (Lucas 1878), and the periodicity classification with its
-three unlisted golden rings is the strongest first candidate — its ingredients are classical, its unified
-statement is what the ledger records, and a human must check OEIS and the literature before claiming more.
+Every ledger entry was checked on 2026-09-02 by two independent prior-art searches per claim (classical
+literature; OEIS / web), merged and re-verified against the primary sources.  Result:
+
+| ledger entry | verdict | where it already is |
+|---|---|---|
+| periodicity classification of the Ψ rings | classical | Lucas 1878; Lewin, *Fibonacci Quart.* 29.4 (1991); Somer 1980; OEIS A087204 |
+| three unlisted golden rings | corollary | `2cos 36° = φ`, `2cos 72° = φ − 1` (Euclid XIII.10) |
+| Ψ is a rescaled Lucas V-sequence | classical | Lucas 1878 / Lehmer 1930 |
+| Ψ is Lehmer's companion sequence `V̄_n(√(2a−b), a)` | corollary (unpublished remark) | Lehmer, *Ann. of Math.* 31 (1930) |
+| ring coordinates of the Lucas–Lehmer index are constant | classical | Ibrahim's own Theorem 7 (arXiv:2404.05772) |
+| golden Lucas–Lehmer seed, valid iff `p ≡ 3 (mod 4)` | classical | Lucas 1876; Robinson 1954; Roettger–Williams 2025 |
+| Ibrahim's tests and the 32 Star conditions are Lucas–Lehmer | corollary | the source proves Theorem 26 via LL; mersenneforum 2024 |
+| Fibonacci rank of apparition of `M_p` is `2^p` for `p ≡ 3 (mod 4)` | corollary | Lucas's law of apparition; OEIS A000057 lists 7, 127, 524287 |
+| QPS closed form, hypergeometric/EGF form, Gegenbauer column, shift identity | **not in the source**; routine technique | — |
+| Mersenne Star errata (Section 10 signs, Lemma 7.4 range, `(1, √5)`, edge list, numbering) | **not previously noted** | — |
+| Ψ-family sequences absent from OEIS: `Ψ(1,4,n)`, `Ψ(2,±1,n)`, their bisections and prime-index sets | **checked absent** (offsets 0–2) | three other apparent gaps were A076737, A159582, A079496 |
+| conjecture: infinitely many primes in `V̄_n(√5, 2)`, `V̄_n(√3, 2)` with Wagstaff-type statistics | Q = 2 case not found | Q = 1 analogue: Hone–Jeffery–Selcoe, arXiv:1802.01793 |
+| statistics of the 52 exponents | negative result | — |
+
+Nothing in the golden-ratio / Mersenne narrative of the brief is new: the Ψ-family is D. H. Lehmer's 1930
+companion sequence, its "Eight Levels" and periodic rings are Chebyshev rotations, and every primality
+statement in the three papers is the Lucas–Lehmer test.  The working label `config.DISCOVERY_LABEL`
+("Triboletti–Fable") is attached only to the four QPS identities, the errata, the OEIS candidates and the
+Q = 2 conjecture, and only as a *working name*: mathematical names stick through publication and citation.
+
+## Research action items
+
+1. **Submit the OEIS candidates** (the legitimate way to put a name on a sequence): `Ψ(1,4,n)`
+   (= the paper's Lucas–Lehmer Ψ-sequence, `a(n) = −4a(n−2) − a(n−4)`), `Ψ(2,−1,n)` and `Ψ(2,1,n)`
+   (`a(n) = ±a(n−2) − 4a(n−4)`), their odd bisections and prime-index sets; closed forms and
+   cross-references (A003500, A001834, A299100, A272931) are in `discoveries/candidates.md`.
+2. **Write a short note** (3–4 pages, arXiv math.NT/GM): "The Quanta Prime Sequence is a Lehmer sequence" —
+   the identification `Ψ = V̄_n(√(2a−b), a)`, the closed form / ₂F₁ / Gegenbauer / shift identities for the full
+   `Ω` table, the observation that Theorems 26 / 9 / 7.6 are Lucas–Lehmer, and the errata.  The ledger's
+   Lean skeletons (`output/lean_skeletons.lean`) are a starting point for a formal appendix.
+3. **Send the errata** to the author / *Arab J. Basic Appl. Sci.* (Section 10 signs, Lemma 7.4, the `(1, √5)`
+   claim, the unlisted edges, the misnumbered cross-references).
+4. **Test the Q = 2 Lehmer-prime conjecture** further: PRP-test `|Ψ(2,±1,n)|` for `n ≤ 5000` (PFGW/GMP), compare
+   with the heuristic `Σ e^γ ln(2n)/ln|Ψ(n)|`, and check the Bilu–Hanrot–Voutier exceptional indices `n = 24, 26`
+   against Voutier's table.
+5. **Rank-of-apparition cofactors for `p ≡ 1 (mod 4)`**: whether `3 | (M_p − 1)/α(M_p)` needs no factorisation
+   (`M_p | F_{(M_p−1)/3}` since `3 | M_p − 1`); run it for all known exponents up to `p ≈ 44497` and compare the
+   cubic-residue frequency of φ with the 1/3 heuristic.  Full cofactors need factordb / Cunningham tables.
+6. **Formalise** the rank-of-apparition theorem and the golden-seed proposition in Lean 4 on top of
+   `Mathlib.NumberTheory.LucasLehmer` and `Nat.fib`.
+7. **Do not** pursue φ-based sieving for GIMPS: the ring coordinates of the Lucas–Lehmer index are constant,
+   the exponent growth factor is 1.42 not φ, and the siever shows no lift over Wagstaff's prior.
