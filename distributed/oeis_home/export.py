@@ -174,8 +174,8 @@ def draft_entries(ready: dict, submitter: str, stamp: str) -> str:
     s = ready["sequences"]
     today = date.today().strftime("%b %d %Y")
     a3_data, a4_data = _data_or_banner(s["A3"], "A3", ready), _data_or_banner(s["A4"], "A4", ready)
-    a3_comment = "%C A3 Terms in DATA are proven primes; further probable-prime indices are listed in the b-file and marked in the extensions." if s["A3"]["data"] else ""
-    a4_comment = "%C A4 Terms in DATA are proven primes; further probable-prime indices are listed in the b-file and marked in the extensions." if s["A4"]["data"] else ""
+    a3_comment = "%C A3 Terms in DATA and in the b-file are proven primes; further probable-prime indices appear only in the comments below (position not yet determined)." if s["A3"]["data"] else ""
+    a4_comment = "%C A4 Terms in DATA and in the b-file are proven primes; further probable-prime indices appear only in the comments below (position not yet determined)." if s["A4"]["data"] else ""
     text = f"""OEIS draft entries generated {stamp} from the OEIS@home ledger (A-numbers are placeholders; submit manually,
 run every PARI line in gp first; DATA lines contain proven terms only).
 
@@ -241,7 +241,7 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 {_pending_comment_lines(s['A3'], 'A3', submitter, today)}
 %e A3 4 is a term because |A1(4)| = 7 is prime; 7 is not a term because |A1(7)| = 1.
 %o A3 (PARI) A1(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 5, 1)*q - 2*p]); q);
-%o A3 (PARI) select(n->isprime(abs(A1(n))), [0..1500]) \\ ispseudoprime for a fast search
+%o A3 (PARI) select(n->isprime(abs(A1(n))), [0..1500]) \\\\ ispseudoprime for a fast search
 %o A3 (Python)
 %o A3 from sympy import isprime
 %o A3 def A1(n):

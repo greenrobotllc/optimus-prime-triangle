@@ -103,11 +103,12 @@ def verify_contributor_file(path: Path, pr_author_id: int | None, existing: dict
         rep.fail(f"{path.name}: login must be your own GitHub login ({pr_author_login.lower()})")
     if is_ext and pr_author_id is not None and not maintainer:
         rep.fail(f"{path.name}: ext- registrations must come from a maintainer")
-    # one key, one login (base registry and the other files of the same PR)
+    # one key, one login: the candidate's whole key history may not overlap any other login's history
+    mine = {p["fingerprint"], *(prev if isinstance(prev, list) else [])}
     for other_login, other in list(existing.items()) + list((pending or {}).items()):
-        if other_login != login and (other.get("fingerprint") == p["fingerprint"] or other.get("pubkey") == p["pubkey"]
-                                     or p["fingerprint"] in other.get("previous_fingerprints", [])):
-            rep.fail(f"{path.name}: this key is already registered under {other_login!r}")
+        theirs = {other.get("fingerprint"), *other.get("previous_fingerprints", [])}
+        if other_login != login and (mine & theirs or other.get("pubkey") == p["pubkey"]):
+            rep.fail(f"{path.name}: this key (or one in its history) is already registered under {other_login!r}")
     old = existing.get(login)
     if old is not None:
         if old["github_id"] != p["github_id"] and not maintainer:
@@ -199,6 +200,9 @@ def _check_verdict_shape(rec: dict, n: int, v: str, fam: Family, errors: list[st
         return
     if rec["n"] != n or rec["variant"] != v:
         errors.append(f"n={n} {v}: candidate order mismatch (got n={rec['n']} {rec['variant']})")
+    if not _is_int(rec["digits"]) or rec["digits"] < 1:
+        errors.append(f"n={n} {v}: digits must be a positive integer")
+        return
     if rec["v"] not in ("prime", "prp", "composite", "unit") or rec["method"] not in ("small", "factor", "fermat", "bpsw", "mr13", "cert"):
         errors.append(f"n={n} {v}: bad v/method {rec['v']}/{rec['method']}")
     if rec["method"] == "factor":

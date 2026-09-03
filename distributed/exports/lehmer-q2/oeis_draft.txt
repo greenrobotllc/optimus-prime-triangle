@@ -59,7 +59,7 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 %N A3 Numbers k such that |A1(k)| is prime, where A1(k) = Vbar_k(sqrt(5), 2) is the Lehmer companion sequence with R = 5, Q = 2.
 %C A3 Since A1(m) divides A1(k) whenever k/m is odd and |A1(m)| = 1 only for m = 1, 2, 3, 7, a term k >= 16 is prime, twice a prime, a power of 2, or one of 21, 49; 21 is a term.
 %C A3 The even terms are 2*j with |A272931(j)| prime and coincide with the even terms of A4.
-%C A3 Terms in DATA are proven primes; further probable-prime indices are listed in the b-file and marked in the extensions.
+%C A3 Terms in DATA and in the b-file are proven primes; further probable-prime indices appear only in the comments below (position not yet determined).
 %C A3 137 is a term, but its position is not yet determined; the corresponding 21-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %C A3 139 is a term, but its position is not yet determined; the corresponding 21-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %C A3 146 is a term, but its position is not yet determined; the corresponding 22-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
@@ -113,7 +113,7 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 %C A3 17522 is a term, but its position is not yet determined; the corresponding 2638-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %e A3 4 is a term because |A1(4)| = 7 is prime; 7 is not a term because |A1(7)| = 1.
 %o A3 (PARI) A1(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 5, 1)*q - 2*p]); q);
-%o A3 (PARI) select(n->isprime(abs(A1(n))), [0..1500]) \ ispseudoprime for a fast search
+%o A3 (PARI) select(n->isprime(abs(A1(n))), [0..1500]) \\ ispseudoprime for a fast search
 %o A3 (Python)
 %o A3 from sympy import isprime
 %o A3 def A1(n):
@@ -133,7 +133,7 @@ run every PARI line in gp first; DATA lines contain proven terms only).
 %N A4 Numbers k such that |A2(k)| is prime, where A2(k) = Vbar_k(sqrt(3), 2) is the Lehmer companion sequence with R = 3, Q = 2.
 %C A4 Since A2(m) divides A2(k) whenever k/m is odd and |A2(m)| = 1 only for m = 1, 2, 5, a term k >= 16 is prime, twice a prime, a power of 2, or 25; 25 is a term.
 %C A4 The even terms coincide with those of A3.
-%C A4 Terms in DATA are proven primes; further probable-prime indices are listed in the b-file and marked in the extensions.
+%C A4 Terms in DATA and in the b-file are proven primes; further probable-prime indices appear only in the comments below (position not yet determined).
 %C A4 131 is a term, but its position is not yet determined; the corresponding 20-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %C A4 146 is a term, but its position is not yet determined; the corresponding 22-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026
 %C A4 149 is a term, but its position is not yet determined; the corresponding 23-digit value is a probable prime (BPSW and strong probable-prime tests to bases 2, 3 and the worker base). - _Andy Triboletti_, Sep 03 2026

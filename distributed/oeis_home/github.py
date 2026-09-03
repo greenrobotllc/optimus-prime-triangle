@@ -64,6 +64,15 @@ def pr_for_commit(repo: str, sha: str, token: str | None = None) -> dict:
             "author_id": int(r["user"]["id"])}
 
 
+LEDGER_HOSTS = ("raw.githubusercontent.com",)
+
+
 def fetch_ledger(raw_url: str) -> dict:
+    """Fetch the upstream ledger; only https URLs on the GitHub raw host are accepted."""
+    from urllib.parse import urlsplit  # noqa: PLC0415
+
+    u = urlsplit(raw_url)
+    if u.scheme != "https" or u.hostname not in LEDGER_HOSTS:
+        raise ValueError(f"ledger URL must be https on {LEDGER_HOSTS}, got {raw_url!r}")
     with urllib.request.urlopen(urllib.request.Request(raw_url, headers={"User-Agent": "oeis-home"}), timeout=30) as resp:
         return json.loads(resp.read().decode("utf-8"))

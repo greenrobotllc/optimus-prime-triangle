@@ -10,9 +10,8 @@ STATES = ("open", "claimed", "pending", "verified", "double_checked", "disputed"
 
 
 def identity(result: dict) -> str:
-    """One identity per GitHub account; a verifier-role key is its own identity, distinct from workers."""
-    if result.get("role") == "verifier":
-        return f"verifier:{result['login']}"
+    """One identity per GitHub account, whatever the role; keys without an account (ext-, verifier
+    keys registered by the maintainer with github_id 0) are identified by their login."""
     gid = result.get("github_id", 0)
     return f"gh:{gid}" if gid else f"login:{result['login']}"
 
@@ -154,7 +153,7 @@ def build(repo: Path, fam: Family, contributors: dict[str, dict], claims: dict[s
         "family": fam.id, "family_hash": fam.hash, "n_max_open": fam.n_max_open,
         "units": units, "positive_claims": sorted(positive, key=lambda p: (p["n"], p["variant"])),
         "verified_through": verified_through,
-        "contributors": {login: {"display_name": c.get("display_name", login), "role": c.get("role", "worker"),
+        "contributors": {login: {"display_name": c.get("display_name", login), "role": c.get("role", "worker"), "github_id": c.get("github_id", 0),
                                  **stats.get(login, {"units_verified": 0, "first_finds": 0, "double_checks": 0, "invalid": 0})}
                          for login, c in contributors.items()},
         "counts": {s: sum(1 for u in units.values() if u["state"] == s) for s in STATES},

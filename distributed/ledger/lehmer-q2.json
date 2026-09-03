@@ -12,7 +12,7 @@
      "role": "first"
     }
    ],
-   "decided_at": "2026-09-03T22:35:48+00:00",
+   "decided_at": "2026-09-03T23:44:18+00:00",
    "disputed": false,
    "family_hash": "sha256:df19f28e18efc63c5c520b6927c908c1e3baa32f531daf8342d08a1dac0e3cef",
    "filtered_checked": {
@@ -13891,7 +13891,7 @@
      "role": "first"
     }
    ],
-   "decided_at": "2026-09-03T22:36:04+00:00",
+   "decided_at": "2026-09-03T23:44:34+00:00",
    "disputed": false,
    "family_hash": "sha256:df19f28e18efc63c5c520b6927c908c1e3baa32f531daf8342d08a1dac0e3cef",
    "filtered_checked": {
@@ -24721,7 +24721,7 @@
      "role": "first"
     }
    ],
-   "decided_at": "2026-09-03T22:36:42+00:00",
+   "decided_at": "2026-09-03T23:45:13+00:00",
    "disputed": false,
    "family_hash": "sha256:df19f28e18efc63c5c520b6927c908c1e3baa32f531daf8342d08a1dac0e3cef",
    "filtered_checked": {
@@ -34768,7 +34768,7 @@
      "role": "first"
     }
    ],
-   "decided_at": "2026-09-03T22:38:05+00:00",
+   "decided_at": "2026-09-03T23:46:38+00:00",
    "disputed": false,
    "family_hash": "sha256:df19f28e18efc63c5c520b6927c908c1e3baa32f531daf8342d08a1dac0e3cef",
    "filtered_checked": {
@@ -52743,6 +52743,7 @@
   "andytriboletti": {
    "display_name": "Andy Triboletti",
    "role": "worker",
+   "github_id": 78852,
    "units_verified": 4,
    "first_finds": 4,
    "double_checks": 0,
@@ -52751,6 +52752,7 @@
   "ext-oeis-home-bot": {
    "display_name": "OEIS@home rebuild bot",
    "role": "bot",
+   "github_id": 0,
    "units_verified": 0,
    "first_finds": 0,
    "double_checks": 0,

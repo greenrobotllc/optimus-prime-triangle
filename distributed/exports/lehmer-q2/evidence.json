@@ -1494,13 +1494,14 @@
    "terms": []
   }
  },
- "tree_sha": "27a7838db813c568d2ef15fd5e944809c37b7ffe",
+ "tree_sha": "691bc92c321f65cf4e79fcc235affb171b87a9cd",
  "release": "",
  "contributors": [
   {
    "login": "andytriboletti",
    "display_name": "Andy Triboletti",
    "role": "worker",
+   "github_id": 78852,
    "units_verified": 4,
    "first_finds": 4,
    "double_checks": 0,
@@ -1510,6 +1511,7 @@
    "login": "ext-oeis-home-bot",
    "display_name": "OEIS@home rebuild bot",
    "role": "bot",
+   "github_id": 0,
    "units_verified": 0,
    "first_finds": 0,
    "double_checks": 0,

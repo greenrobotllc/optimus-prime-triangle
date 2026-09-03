@@ -18,6 +18,7 @@ def test_unit_state_machine():
     assert L.unit_state(_unit([a, b])) == "double_checked"
     assert L.unit_state(_unit([a, dict(b, role="verifier", github_id=0)])) == "double_checked"
     assert L.unit_state(_unit([dict(b, role="verifier", github_id=0)])) == "verified"          # one verifier result is one result
+    assert L.unit_state(_unit([a, {"login": "alice-verifier", "status": "valid", "github_id": 1, "role": "verifier"}])) == "verified"   # same account
     assert L.unit_state(_unit([a, b], disputed=True)) == "disputed"
     assert L.unit_state(_unit([dict(a, status="invalid")])) == "invalid"
     assert L.unit_state(_unit([dict(a, status="withdrawn")])) == "invalid"

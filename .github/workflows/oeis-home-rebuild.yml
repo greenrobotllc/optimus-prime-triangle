@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: python -m pip install --require-hashes -r distributed/requirements-lock.txt
-      - name: Write the bot key (required: unsigned verified records are never trusted)
+      - name: "Write the bot key (required: unsigned verified records are never trusted)"
         env: { OEIS_HOME_BOT_KEY: "${{ secrets.OEIS_HOME_BOT_KEY }}" }
         run: |
           if [ -z "$OEIS_HOME_BOT_KEY" ]; then echo "::error::OEIS_HOME_BOT_KEY secret is missing; the rebuild cannot sign verified records"; exit 1; fi

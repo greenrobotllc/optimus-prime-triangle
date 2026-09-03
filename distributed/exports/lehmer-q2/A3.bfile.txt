@@ -1,4 +1,4 @@
-# A3 b-file, k = 1..36, generated 2026-09-03; verified_through = 131; tree 27a7838db813
+# A3 b-file, k = 1..36, generated 2026-09-03; verified_through = 131; tree 691bc92c321f
 # status per term in evidence.json (proven = PARI isprime / deterministic; prp = BPSW + strong PRP tests)
 1 0
 2 4

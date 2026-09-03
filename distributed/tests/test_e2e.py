@@ -246,3 +246,45 @@ def test_force_rerun_uses_versioned_name(tiny_repo, tiny_fam, fixture_keys, monk
     releases = json.loads((root / "distributed" / "RELEASES.json").read_text())
     assert verify_result_file(versioned, tiny_fam, load_contributors(root), releases, full=False).ok
     versioned.unlink()
+
+
+def test_checkpoint_is_rejected_when_it_does_not_match_the_candidates(tiny_fam, fixture_keys, tmp_path):
+    fp = keys.fingerprint(keys.public_raw(fixture_keys["alice"]))
+    full = run_unit(tiny_fam, UID, fp, "alice", progress=None)
+    partial = tmp_path / "p.json"
+    # stale checkpoint: same unit/base/worker but a different family hash -> discarded, recomputed identically
+    partial.write_text(json.dumps({"unit_id": UID, "base": full["base"], "worker": fp, "family_hash": "sha256:" + "0" * 64,
+                                   "verdicts": [dict(full["verdicts"][0], n=999)]}))
+    resumed = run_unit(tiny_fam, UID, fp, "alice", progress=None, partial_path=partial)
+    assert resumed["verdicts"] == full["verdicts"]
+    # shifted checkpoint (wrong candidate at position 0) is discarded as well
+    partial.write_text(json.dumps({"unit_id": UID, "base": full["base"], "worker": fp, "family_hash": tiny_fam.hash,
+                                   "verdicts": full["verdicts"][1:5]}))
+    assert run_unit(tiny_fam, UID, fp, "alice", progress=None, partial_path=partial)["verdicts"] == full["verdicts"]
+
+
+def test_non_integer_digits_is_a_named_error(tiny_repo, tiny_fam, fixture_keys, payloads):
+    root = tiny_repo
+    releases = json.loads((root / "distributed" / "RELEASES.json").read_text())
+    p = copy.deepcopy(payloads["bob"])
+    p["verdicts"][0]["digits"] = "5"
+    path = _write(root, "bob", p, fixture_keys["bob"])
+    rep = verify_result_file(path, tiny_fam, load_contributors(root), releases)
+    assert not rep.ok and any("digits must be a positive integer" in e for e in rep.errors)
+    path.unlink()
+
+
+def test_key_history_overlap_is_rejected(tiny_repo, tiny_fam, fixture_keys, make_contributor):
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    root = tiny_repo
+    releases = json.loads((root / "distributed" / "RELEASES.json").read_text())
+    base_reg = load_contributors(root)
+    newcomer = Ed25519PrivateKey.generate()
+    payload = make_contributor("erin", newcomer, 9001)
+    payload["previous_fingerprints"] = [base_reg["alice"]["fingerprint"]]          # claims alice's current key as history
+    path = root / "distributed" / "contributors" / "erin.json"
+    path.write_bytes(canon.file_bytes(keys.sign_envelope("contributor", payload, newcomer)))
+    rep = verify_pr(root, [("A", "distributed/contributors/erin.json")], 9001, tiny_fam, releases, base_contributors=base_reg, pr_author_login="erin")
+    assert not rep.ok and any("already registered under 'alice'" in e for e in rep.errors)
+    path.unlink()

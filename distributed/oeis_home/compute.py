@@ -160,7 +160,11 @@ def run_unit(fam: Family, uid: str, fp: str, login: str, progress=print, partial
         import json  # noqa: PLC0415
 
         saved = json.loads(Path(partial_path).read_text())
-        if saved.get("unit_id") == uid and saved.get("base") == base and saved.get("worker") == fp:
+        prefix_ok = (saved.get("unit_id") == uid and saved.get("base") == base and saved.get("worker") == fp
+                     and saved.get("family_hash") == fam.hash and isinstance(saved.get("verdicts"), list)
+                     and len(saved["verdicts"]) <= len(cands)
+                     and all(isinstance(r, dict) and (r.get("n"), r.get("variant")) == c for r, c in zip(saved["verdicts"], cands, strict=False)))
+        if prefix_ok:
             done = saved["verdicts"]
         else:
             saved = {}
@@ -180,11 +184,11 @@ def run_unit(fam: Family, uid: str, fp: str, login: str, progress=print, partial
             if progress:
                 progress(f"{uid} {i + 1}/{len(cands)} n={n} {v}: {rec['v']} ({rec['method']}, {rec['digits']} digits)")
             if partial_path and time.perf_counter() - last > checkpoint_s:
-                _write_partial(Path(partial_path), uid, base, fp, done, elapsed_before + int((time.perf_counter() - t0) * 1000))
+                _write_partial(Path(partial_path), uid, base, fp, done, elapsed_before + int((time.perf_counter() - t0) * 1000), fam.hash)
                 last = time.perf_counter()
     except BaseException:
         if partial_path and done:
-            _write_partial(Path(partial_path), uid, base, fp, done, elapsed_before + int((time.perf_counter() - t0) * 1000))
+            _write_partial(Path(partial_path), uid, base, fp, done, elapsed_before + int((time.perf_counter() - t0) * 1000), fam.hash)
         raise
     payload = {
         "schema": "oeis-home/v1/result", "family": fam.id, "family_hash": fam.hash,
@@ -198,10 +202,10 @@ def run_unit(fam: Family, uid: str, fp: str, login: str, progress=print, partial
     return payload
 
 
-def _write_partial(path: Path, uid: str, base: int, fp: str, verdicts: list[dict], elapsed_ms: int = 0) -> None:
+def _write_partial(path: Path, uid: str, base: int, fp: str, verdicts: list[dict], elapsed_ms: int = 0, family_hash: str = "") -> None:
     import json  # noqa: PLC0415
 
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"unit_id": uid, "base": base, "worker": fp, "verdicts": verdicts, "elapsed_ms": elapsed_ms}))
+    tmp.write_text(json.dumps({"unit_id": uid, "base": base, "worker": fp, "family_hash": family_hash, "verdicts": verdicts, "elapsed_ms": elapsed_ms}))
     os.replace(tmp, path)
