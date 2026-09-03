@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oeis-home"
+version = "0.1.0"
+description = "OEIS@home pilot: verification-first volunteer computing for the Lehmer companion prime hunt (Q = 2)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = ["gmpy2>=2.2", "cryptography>=42"]
+
+[project.scripts]
+oeis-home = "oeis_home.cli:main"
+
+[tool.setuptools]
+packages = ["oeis_home"]
+
+[tool.setuptools.package-data]
+oeis_home = ["schemas/*.json"]

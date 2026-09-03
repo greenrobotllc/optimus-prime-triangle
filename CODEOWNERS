@@ -1,0 +1,5 @@
+# Code paths of the OEIS@home pilot require maintainer review; volunteer PRs touch only data directories.
+/distributed/oeis_home/**    @andytriboletti
+/distributed/families/**     @andytriboletti
+/distributed/RELEASES.json   @andytriboletti
+/.github/**                  @andytriboletti

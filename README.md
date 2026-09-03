@@ -247,6 +247,16 @@ statement in the three papers is the Lucas–Lehmer test.  The working label `co
 ("Triboletti–Fable") is attached only to the four QPS identities, the errata, the OEIS candidates and the
 Q = 2 conjecture, and only as a *working name*: mathematical names stick through publication and citation.
 
+## OEIS@home pilot (`distributed/`)
+
+The first research action item is now a working pilot: a verification-first volunteer-computing
+pipeline for the Lehmer companion primes with Q = 2 (`|Ψ(2, ±1, n)|`), whose prime-index sequences are
+not in OEIS. Volunteers run `oeis-home run --unit …`, results are Ed25519-signed canonical JSON files
+contributed by pull request, CI recomputes every line with the base branch's code and the volunteer's own
+test base, a rebuild on `main` writes the ledger, the OEIS-ready exports and the results page, and a
+second account's matching result is the credit-bearing double check. See `distributed/README.md` and
+`distributed/CONTRIBUTING.md`. All OEIS submissions stay manual and human.
+
 ## Research action items
 
 1. **Submit the OEIS candidates** (the legitimate way to put a name on a sequence): `Ψ(1,4,n)`

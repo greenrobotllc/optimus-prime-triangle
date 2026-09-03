@@ -280,3 +280,12 @@ def test_fibonacci_mod_iterative_handles_huge_indices():
     assert ps.fibonacci_mod(1 << 126, M) != 0
     assert ps.lucas_number_mod(1 << 126, M) == 0
     assert all(ps.lucas_number_mod(n, 1009) == ps.lucas(n) % 1009 for n in range(60))
+
+
+def test_psi_fast_matches_recurrence_and_is_exact_for_large_n():
+    for a in range(-3, 4):
+        for b in range(-4, 5):
+            for n in range(0, 40):
+                assert ps.psi_fast(a, b, n) == ps.psi(a, b, n)
+    big = ps.psi_fast(2, -1, 3000)
+    assert big == ps.psi(2, -1, 3000) and abs(big).bit_length() in range(1490, 1505)   # |Ψ(2,−1,n)| ≈ 2^{n/2}

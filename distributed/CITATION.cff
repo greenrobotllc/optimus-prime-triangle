@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: "OEIS@home pilot: Lehmer companion primes with Q = 2"
+message: "If you use these results, cite the repository and credit the volunteers named in distributed/exports/."
+type: software
+authors:
+  - family-names: Triboletti
+    given-names: Andy
+repository-code: "https://github.com/greenrobotllc/optimus-prime-triangle"
+license: MIT

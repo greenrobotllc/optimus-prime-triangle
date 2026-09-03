@@ -1,0 +1,10 @@
+{
+ "accepted": [
+  {
+   "version": "0.1.0",
+   "worker_sha256": "35ec7cb8f336175492bfffadc09c1ce04687fa8905ed5c06dec75a7e359c99ad",
+   "git_tag": "oeis-home-v0.1.0"
+  }
+ ],
+ "withdrawn": []
+}

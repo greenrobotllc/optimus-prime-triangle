@@ -1,0 +1,52 @@
+name: oeis-home rebuild
+on:
+  push:
+    branches: [main]
+    paths: ["distributed/**"]
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+concurrency: { group: oeis-home-rebuild, cancel-in-progress: false }
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: |
+          python -m pip install --require-hashes -r distributed/requirements-lock.txt
+          python -m pip install -e distributed --no-deps
+      - name: Write the bot key
+        env: { OEIS_HOME_BOT_KEY: "${{ secrets.OEIS_HOME_BOT_KEY }}" }
+        run: |
+          if [ -n "$OEIS_HOME_BOT_KEY" ]; then mkdir -p ~/.oeis-home && echo "$OEIS_HOME_BOT_KEY" | base64 -d > ~/.oeis-home/bot.ed25519 && chmod 600 ~/.oeis-home/bot.ed25519; fi
+      - name: Re-verify with main's code and rebuild verified/, ledger/, exports/, docs/
+        run: |
+          if [ -f ~/.oeis-home/bot.ed25519 ]; then oeis-home rebuild --bot-key ~/.oeis-home/bot.ed25519; else oeis-home rebuild; fi
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add distributed/verified distributed/ledger distributed/exports distributed/docs
+          git diff --cached --quiet || git commit -m "oeis-home: rebuild [skip ci]" && git push
+      - name: Open discovery issues for newly confirmed prp lines
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          d = json.load(open("distributed/docs/data.json"))
+          for p in d["positive_claims"]:
+              if p.get("ci_confirmed") and not p.get("verifier_login"):
+                  title = f"Discovery: lehmer-q2 n={p['n']} {p['variant']} ({p['digits']} digits)"
+                  exists = subprocess.run(["gh", "issue", "list", "--search", f'"{title}" in:title', "--json", "number"], capture_output=True, text=True).stdout
+                  if "number" in exists and exists.strip() != "[]":
+                      continue
+                  body = ("Checklist: second result from a distinct account or verifier key; maintainer `gp` check recorded with "
+                          "`oeis-home rebuild --set-pari <unit> <n> <variant> <isprime|ispseudoprime>`; optional certificate; OEIS extension line drafted by export.")
+                  subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", "discovery"], check=False)
+          PY
