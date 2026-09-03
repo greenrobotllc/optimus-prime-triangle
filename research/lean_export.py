@@ -14,6 +14,8 @@ from research.discovery import Candidate
 
 PREAMBLE = """import Mathlib
 
+open Real
+
 /-!  Ψ-sequence of Ibrahim (Definition 4.1):  Ψ 0 = 2, Ψ 1 = 1,
      Ψ (n+2) = (2a − b)^{δ(n+1)} · Ψ (n+1) − a · Ψ n,  δ(m) = m mod 2.  -/
 def psiZ (a b : ℤ) : ℕ → ℤ
@@ -26,7 +28,6 @@ noncomputable def psiR (a b : ℝ) : ℕ → ℝ
   | 1 => 1
   | (n + 2) => (if n % 2 = 0 then (2 * a - b) else 1) * psiR a b (n + 1) - a * psiR a b n
 
-open Real in
 /-- Mathlib already formalises the Lucas–Lehmer test: see
     `LucasLehmer.lucas_lehmer_sufficiency` in `Mathlib.NumberTheory.LucasLehmer`. -/
 example : True := trivial
@@ -50,7 +51,8 @@ _PROPS: dict[str, str] = {
         "    (2 ^ p - 1) ∣ Nat.fib (2 ^ p) ∧ ¬ (2 ^ p - 1) ∣ Nat.fib (2 ^ (p - 1))"
     ),
     "lehmer-identification": (
-        "∀ a b : ℤ, ∀ n : ℕ, (psiZ a b n : ℝ) = LehmerVbar (Real.sqrt (2 * a - b)) a n"
+        "∀ a b : ℤ, ∀ n : ℕ, 0 < 2 * a - b →\n"
+        "    (psiZ a b n : ℝ) = LehmerVbar (Real.sqrt (2 * a - b)) a n"
     ),
     "normalisation-identity": (
         "∀ a b : ℤ, ∀ n : ℕ, 2 * a ≠ b →\n"

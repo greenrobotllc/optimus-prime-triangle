@@ -75,3 +75,8 @@ def test_scale_feature_indices():
     assert f.scale_feature_indices(True) == [0, 1, 2, 3]
     with pytest.raises(ValueError):
         f.extract_features(1)
+
+
+def test_build_dataset_rejects_empty_pool():
+    with pytest.raises(ValueError):
+        build_dataset(5000, 5002)

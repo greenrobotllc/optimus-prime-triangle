@@ -4,7 +4,7 @@ from __future__ import annotations
 import sympy as sp
 
 from core_math import symbolic_bridge as sb
-from core_math.psi_sequence import PHI_EXACT, golden_level_exact
+from core_math.psi_sequence import golden_level_exact
 
 
 def test_psi_poly_homogeneous_degree_floor_n_half():
@@ -43,9 +43,9 @@ def test_directional_operator_golden_gives_minus_phi():
 def test_ring_parameters_are_roots_of_psi_b_poly_2_to_6():
     roots = sb.ring_parameter_roots()
     assert roots[2] == [0] and roots[3] == [-1]
-    assert [sb.is_zero(r - e) for r, e in zip(roots[4], [-sp.sqrt(2), sp.sqrt(2)])] == [True, True]
-    assert [sb.is_zero(r - e) for r, e in zip(roots[5], [-sp.GoldenRatio, sp.GoldenRatio - 1])] == [True, True]
-    assert [sb.is_zero(r - e) for r, e in zip(roots[6], [-sp.sqrt(3), 0, sp.sqrt(3)])] == [True, True, True]
+    assert [sb.is_zero(r - e) for r, e in zip(roots[4], [-sp.sqrt(2), sp.sqrt(2)], strict=True)] == [True, True]
+    assert [sb.is_zero(r - e) for r, e in zip(roots[5], [-sp.GoldenRatio, sp.GoldenRatio - 1], strict=True)] == [True, True]
+    assert [sb.is_zero(r - e) for r, e in zip(roots[6], [-sp.sqrt(3), 0, sp.sqrt(3)], strict=True)] == [True, True, True]
     assert sb.psi_b_poly(5).as_expr() == sp.expand(sp.Symbol("b") ** 2 + sp.Symbol("b") - 1)
 
 

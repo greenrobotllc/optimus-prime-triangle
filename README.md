@@ -213,8 +213,8 @@ as a lift over the Wagstaff prior larger than one standard deviation.
 |---|---|---|---|
 | G1 | infinitude of Mersenne primes; **Lenstra–Pomerance–Wagstaff** `#{p ≤ x} ~ e^γ log₂ x`; **Eberhart** `q_n ~ (3/2)^n` | `M_p = 2^p − 1` | `research/growth_laws.py` |
 | G2 | **New Mersenne Conjecture** (Bateman–Selfridge–Wagstaff 1989) | `Ψ(−2,−5,p) = M_p`, `Ψ(2,−5,p) = (2^p+1)/3` | `nmc_dashboard`: no counterexample for p ≤ 1000; all three hold for p ∈ {3, 5, 7, 13, 17, 19, 31, 61, 127} |
-| G3 | are all Mersenne numbers squarefree? (**Wieferich primes** `q² | 2^{q−1} − 1`) | | `wieferich_search`: {1093, 3511} below 10⁵; no `q² | M_p` for p ≤ 200, q ≤ 10⁵ |
-| G4 | **Wall–Sun–Sun primes** `p² | F_{p−(5/p)}` | | none below 2·10⁴; every Mersenne prime `M_p` divides `F_{M_p − (5|M_p)}` |
+| G3 | are all Mersenne numbers squarefree? (**Wieferich primes** `q² \| 2^{q−1} − 1`) | | `wieferich_search`: {1093, 3511} below 10⁵; no `q² \| M_p` for p ≤ 200, q ≤ 10⁵ |
+| G4 | **Wall–Sun–Sun primes** `p² \| F_{p−(5/p)}` | | none below 2·10⁴; every Mersenne prime `M_p` divides `F_{M_p − (5\|M_p)}` |
 | G5 | primes in Lucas sequences (no sequence proven to contain infinitely many) | normalisation identity | prime-density census over the (a, b) family |
 | G6 | odd perfect numbers; Catalan–Mersenne `M_{M_127}` | | context only — out of computational reach |
 | G7 | periodicity classification | `Ψ(1, −2cos 2θ, n) = 2cos nθ` | `research/periodicity.py`, exact verification |

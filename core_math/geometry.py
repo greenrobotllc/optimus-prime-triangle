@@ -227,7 +227,7 @@ def build_star(layout: str = cfg.STAR_LAYOUT) -> StarGeometry:
         vertices=star_vertices(layout),
         edges=star_edges(layout),
         vertex_levels=np.zeros(8) if paper else np.array(EIGHT_LEVELS, dtype=float),
-        vertex_labels=list(PAPER_STAR_ORDER) if paper else [f"L={l}" for l in EIGHT_LEVELS],
+        vertex_labels=list(PAPER_STAR_ORDER) if paper else [f"L={lvl}" for lvl in EIGHT_LEVELS],
     )
     if paper:
         star.triangle = np.array([[*PAPER_TRIANGLE[k], 0.0] for k in ("A", "B", "C")], dtype=float)

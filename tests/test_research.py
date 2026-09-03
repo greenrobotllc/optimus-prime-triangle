@@ -153,7 +153,7 @@ def test_prime_density_scan_finds_the_classical_points():
 
 def test_ledger_round_trip_and_label(tmp_path):
     path = tmp_path / "ledger.md"
-    ledger, cen, density = dc.run_discovery(path, {"rotation_form": True, "normalisation_identity": True})
+    ledger, _cen, _density = dc.run_discovery(path, {"rotation_form": True, "normalisation_identity": True})
     assert path.exists()
     text = path.read_text(encoding="utf-8")
     assert "Triboletti" in text and "novelty" in text and "```json" in text

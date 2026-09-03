@@ -4,7 +4,7 @@
     {
       "name": "output-viewer",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "/Users/andytriboletti/Documents/GitHub/optimus-prime-triangle/output"],
+      "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "output"],
       "port": 8765
     }
   ]

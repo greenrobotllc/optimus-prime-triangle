@@ -59,13 +59,13 @@ _KNOWN_SET = frozenset(KNOWN_MERSENNE_EXPONENTS)
 #: Seeds proven to work for every odd prime exponent (OEIS A018844, first three).
 UNIVERSAL_LL_SEEDS: tuple[int, ...] = (4, 10, 52)
 
-_MR_BASES = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
+_MR_BASES = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41)   # 13 bases: deterministic below 3.3·10^24
 _MR_DETERMINISTIC_BOUND = 3_317_044_064_679_887_385_961_981
 
 
 # --------------------------------------------------------------------------- primes
 def is_prime_int(n: int) -> bool:
-    """Deterministic primality for ``n < 3.3·10^24`` (Miller–Rabin with 12 bases);
+    """Deterministic primality for ``n < 3.3·10^24`` (Miller–Rabin with the first 13 prime bases);
     delegates to ``sympy.isprime`` beyond that bound."""
     if n < 2:
         return False

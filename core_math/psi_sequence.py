@@ -169,7 +169,7 @@ class QuadInt:
 
     def conjugate(self) -> "QuadInt":
         """Galois conjugate: ``√d ↦ −√d``; ``φ ↦ 1 − φ``."""
-        c0, c1, _, _ = _RINGS[self.ring]
+        _, c1, _, _ = _RINGS[self.ring]
         if c1 == 0:
             return QuadInt(self.u, -self.v, self.ring)
         return QuadInt(self.u + c1 * self.v, -self.v, self.ring)
@@ -182,7 +182,7 @@ class QuadInt:
     def to_sympy(self) -> Any:
         import sympy
 
-        c0, c1, _, _ = _RINGS[self.ring]
+        c0, _, _, _ = _RINGS[self.ring]
         omega = sympy.GoldenRatio if self.ring == "phi" else sympy.sqrt(c0)
         return sympy.Rational(self.u) + sympy.Rational(self.v) * omega
 

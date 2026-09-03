@@ -19,8 +19,7 @@ import numpy as np
 
 import config as cfg
 from core_math.geometry import build_star, exponent_coordinates
-from core_math.mersenne import (KNOWN_MERSENNE_EXPONENTS, is_known_mersenne_exponent, lucas_lehmer, prime_exponents,
-                                sophie_germain_factor, trial_factor, wagstaff_probability)
+from core_math.mersenne import (KNOWN_MERSENNE_EXPONENTS, is_known_mersenne_exponent, lucas_lehmer, sophie_germain_factor, trial_factor, wagstaff_probability)
 from core_math.psi_sequence import eight_level, golden_level
 from core_math.symbolic_bridge import bridge_report
 from ml_models.dataset import build_dataset
@@ -34,13 +33,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--full", action="store_true", help=f"use p ≤ {cfg.P_MAX_FULL}")
     ap.add_argument("--model", choices=("logistic", "mlp", "both"), default="logistic")
     ap.add_argument("--no-arithmetic", action="store_true", help="geometry-only features (ablation)")
-    ap.add_argument("--cv-repeats", type=int, default=cfg.CV_REPEATS)
+    ap.add_argument("--cv-repeats", type=_positive_int, default=cfg.CV_REPEATS, help="stratified CV repeats (>= 1)")
     ap.add_argument("--no-plot", action="store_true")
     ap.add_argument("--research", action="store_true", help="run the research dashboards and update the ledger")
     ap.add_argument("--out", type=Path, default=cfg.OUTPUT_DIR)
     ap.add_argument("--seed", type=int, default=cfg.SEED)
     ap.add_argument("--layout", choices=cfg.STAR_LAYOUTS, default=cfg.STAR_LAYOUT)
     return ap.parse_args(argv)
+
+
+def _positive_int(text: str) -> int:
+    value = int(text)
+    if value < 1:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return value
 
 
 def banner(title: str) -> None:
@@ -66,8 +72,15 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     # ------------------------------------------------------------------ 2. cross-validated evaluation
     banner("2. siever evaluation (repeated stratified CV)")
     include_mlp = args.model in ("mlp", "both")
+    n_pos, n_neg = int(y.sum()), int(len(y) - y.sum())
+    if min(n_pos, n_neg) < 2:
+        raise SystemExit(f"candidate pool p ≤ {p_max} has {n_pos} positive and {n_neg} negative exponents; "
+                         "stratified cross-validation needs at least two of each — raise --p-max")
+    folds = min(cfg.CV_FOLDS, n_pos, n_neg)
+    if folds < cfg.CV_FOLDS:
+        print(f"note: using {folds} folds (smallest class has {min(n_pos, n_neg)} samples)")
     factories = default_model_factories(use_arith, include_mlp=include_mlp)
-    report = evaluate_cv(factories, X, y, folds=cfg.CV_FOLDS, repeats=args.cv_repeats, seed=args.seed)
+    report = evaluate_cv(factories, X, y, folds=folds, repeats=args.cv_repeats, seed=args.seed)
     print(format_cv_table(report))
     print(honesty_line(report, "logistic"))
     if include_mlp:
@@ -154,9 +167,9 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         w.writerows(rows)
     show = sorted(rows, key=lambda r: -r[1])[:12]
     widths = [max(len(h), 9) for h in header]
-    print("  ".join(h.rjust(w) for h, w in zip(header, widths)))
+    print("  ".join(h.rjust(w) for h, w in zip(header, widths, strict=True)))
     for r in show:
-        print("  ".join((f"{v:.3f}" if isinstance(v, float) else (str(v) if v != "" else "-")).rjust(w) for v, w in zip(r, widths)))
+        print("  ".join((f"{v:.3f}" if isinstance(v, float) else (str(v) if v != "" else "-")).rjust(w) for v, w in zip(r, widths, strict=True)))
     print(f"wrote {csv_path}")
 
     # ------------------------------------------------------------------ 8. research dashboards

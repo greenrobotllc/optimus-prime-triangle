@@ -87,7 +87,9 @@ def test_star_has_8_vertices_12_edges_all_layouts():
 
 def test_stella_octangula_edges_are_two_tetrahedra():
     edges = g.star_edges("stella_octangula")
-    parity = lambda k: bin(k).count("1") % 2
+    def parity(k: int) -> int:
+        return bin(k).count("1") % 2
+
     assert all(parity(i) == parity(j) for i, j in edges)
 
 

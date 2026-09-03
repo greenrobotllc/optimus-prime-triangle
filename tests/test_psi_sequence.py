@@ -147,8 +147,8 @@ def test_mersenne_and_wagstaff_family():
 def test_psi_1_3_is_signed_lucas_and_lucas_at_powers_of_two():
     for n in range(40):
         assert ps.psi(1, 3, n) == (-1) ** (n // 2) * ps.lucas(n)
-    for l in (2, 3, 4, 5):
-        assert ps.psi(1, 3, 2 ** l) == ps.lucas(2 ** l)
+    for lg in (2, 3, 4, 5):
+        assert ps.psi(1, 3, 2 ** lg) == ps.lucas(2 ** lg)
 
 
 def test_chebyshev_link():

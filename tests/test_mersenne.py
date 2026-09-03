@@ -108,8 +108,8 @@ def test_wagstaff_probability_in_unit_interval_and_decreasing():
     ps = m.prime_exponents(5, 5000)
     vals = [m.wagstaff_probability(p) for p in ps]
     assert all(0.0 <= v <= 1.0 for v in vals)
-    same_class = [v for p, v in zip(ps, vals) if p % 4 == 3]
-    assert all(a >= b for a, b in zip(same_class, same_class[1:]))
+    same_class = [v for p, v in zip(ps, vals, strict=True) if p % 4 == 3]
+    assert all(a >= b for a, b in zip(same_class, same_class[1:], strict=False))
     assert m.wagstaff_probability(1) == 0.0
 
 
@@ -121,3 +121,10 @@ def test_is_prime_int_agrees_with_sieve():
 
 def test_iter_mersenne_numbers():
     assert list(m.iter_mersenne_numbers(7)) == [(2, 3), (3, 7), (5, 31), (7, 127)]
+
+
+def test_miller_rabin_bases_cover_the_stated_bound():
+    # 13 prime bases (2..41) are deterministic below 3 317 044 064 679 887 385 961 981
+    assert len(m._MR_BASES) == 13 and m._MR_BASES[-1] == 41
+    # the smallest strong pseudoprime to the first 12 bases must be caught by the 13th
+    assert not m.is_prime_int(318665857834031151167461)

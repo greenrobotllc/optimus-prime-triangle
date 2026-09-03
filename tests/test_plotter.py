@@ -33,7 +33,7 @@ def test_figure_has_expected_trace_names():
 
 
 def test_write_html_creates_file(tmp_path):
-    ps, points, plaus, ll = _sample()
+    _, points, plaus, ll = _sample()
     fig = pl.build_star_figure(build_star("stella_octangula"), points, plaus, ll, set(KNOWN_MERSENNE_EXPONENTS))
     out = pl.write_html(fig, tmp_path / "star.html", include_plotlyjs="cdn")
     assert out.exists() and out.stat().st_size > 10_000
@@ -41,6 +41,6 @@ def test_write_html_creates_file(tmp_path):
 
 
 def test_period20_wheel_png(tmp_path):
-    ps, points, plaus, ll = _sample()
+    _, points, plaus, ll = _sample()
     out = pl.plot_period20_wheel_png(points, plaus, ll, set(KNOWN_MERSENNE_EXPONENTS), tmp_path / "wheel.png")
     assert out.exists() and out.stat().st_size > 5_000

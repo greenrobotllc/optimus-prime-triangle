@@ -54,7 +54,6 @@ def test_guards():
 
 # --------------------------------------------------------------------------- identities found in this repository
 import random  # noqa: E402
-from fractions import Fraction  # noqa: E402
 
 
 def test_closed_form_matches_recurrence_everywhere():

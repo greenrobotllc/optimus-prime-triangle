@@ -34,7 +34,7 @@ def test_mlp_trains_deterministically_with_seed(data):
 
 
 def test_wagstaff_and_constant_baselines(data):
-    X, y, ps = data
+    X, y, _ = data
     w = sv.WagstaffBaseline().predict_proba(X)
     assert np.all((w >= 0) & (w <= 1)) and w[0] >= w[-1]
     c = sv.ConstantBaseline().fit(X, y).predict_proba(X)
@@ -63,3 +63,9 @@ def test_train_default_and_unknown_kind(data):
     assert sv.score_candidates(model, X[:3]).shape == (3,)
     with pytest.raises(ValueError):
         sv.train_default("svm", X, y)
+
+
+def test_honesty_line_with_single_repeat(data):
+    X, y, _ = data
+    report = sv.evaluate_cv(sv.default_model_factories(include_mlp=False), X, y, folds=3, repeats=1, seed=1)
+    assert "no spread estimate" in sv.honesty_line(report)

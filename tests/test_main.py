@@ -26,3 +26,12 @@ def test_pipeline_research_smoke(tmp_path, monkeypatch):
     assert (tmp_path / "research_report.md").exists() and (tmp_path / "lean_skeletons.lean").exists()
     assert (tmp_path / "ledger.md").exists()
     assert res["research"]["nmc"]["counterexamples"] == []
+
+
+def test_cli_rejects_nonpositive_repeats_and_tiny_pools(tmp_path):
+    import pytest
+
+    with pytest.raises(SystemExit):
+        entry.parse_args(["--cv-repeats", "0"])
+    with pytest.raises(SystemExit):
+        entry.run(entry.parse_args(["--p-max", "11", "--no-plot", "--out", str(tmp_path)]))

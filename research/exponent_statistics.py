@@ -29,7 +29,7 @@ import numpy as np
 
 import config as cfg
 from core_math.geometry import proximity_metrics
-from core_math.mersenne import KNOWN_MERSENNE_EXPONENTS, is_prime_int, wagstaff_probability
+from core_math.mersenne import KNOWN_MERSENNE_EXPONENTS, is_prime_int
 
 RESIDUE_MODULI: tuple[int, ...] = (4, 8, 12, 20, 24)
 
@@ -67,9 +67,9 @@ def monte_carlo(statistic: Callable[[list[int]], float], exponents=KNOWN_MERSENN
     null = np.array([statistic([random_prime_near(q, rng) for q in base]) for _ in range(n_rep)])
     if two_sided:
         centre = float(np.median(null))
-        p_value = float(np.mean(np.abs(null - centre) >= abs(observed - centre)))
+        p_value = float((np.count_nonzero(np.abs(null - centre) >= abs(observed - centre)) + 1) / (n_rep + 1))
     else:
-        p_value = float(np.mean(null >= observed))
+        p_value = float((np.count_nonzero(null >= observed) + 1) / (n_rep + 1))
     return {"observed": float(observed), "null_mean": float(null.mean()), "null_sd": float(null.std(ddof=1)),
             "p_value": p_value, "n_rep": n_rep}
 
@@ -84,7 +84,8 @@ def residue_test(k: int, exponents=KNOWN_MERSENNE_EXPONENTS, n_rep: int = 2000, 
 def phi_zone_test(metric: str = "phi_zone_distance", exponents=KNOWN_MERSENNE_EXPONENTS, n_rep: int = 2000,
                   seed: int = cfg.SEED) -> dict[str, object]:
     """Mean proximity metric of the exponents vs the size-matched null (two-sided)."""
-    stat = lambda ps: float(np.mean([proximity_metrics(p)[metric] for p in ps]))
+    def stat(ps: list[int]) -> float:
+        return float(np.mean([proximity_metrics(p)[metric] for p in ps]))
     res = monte_carlo(stat, exponents, n_rep, seed, two_sided=True)
     res["metric"] = metric
     return res

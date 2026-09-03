@@ -243,7 +243,7 @@ def seed_candidates(bridge_report: dict[str, bool] | None = None, census_rows: l
             statement=THEOREM_STATEMENT,
             kind="theorem",
             numeric_verified=golden_ok,
-            proof_status="proved (closed form; rotation form sympy-checked for n ≤ 8)" if br.get("rotation_form", True) else "unproved",
+            proof_status="proved (closed form; rotation form sympy-checked for n ≤ 8)" if br.get("rotation_form") is True else "unproved (rotation form not sympy-checked in this run)",
             novelty="classical",
             evidence="exact periods in Z, Z[√2], Z[√3], Z[φ] for all six paper rings and the four golden rings; float check for every reduced rotation k/m with m ≤ 30",
             notes="Ibrahim's own Chebyshev identity at x = cos θ plus the folklore criterion 'a linear recurrence is periodic iff its roots are roots of unity'. Lewin (1991) states the period formula for V_n(2cos θ, 1) explicitly; OEIS A087204 is the period-6 ring.",
@@ -282,7 +282,7 @@ def seed_candidates(bridge_report: dict[str, bool] | None = None, census_rows: l
             statement="Ψ(a, b, n) = (2a − b)^{⌊n/2⌋} · V_n(1, a/(2a − b)).",
             kind="identity",
             numeric_verified=True,
-            proof_status="sympy-proved (n ≤ 12); general proof via Binet" if br.get("normalisation_identity", True) else "unproved",
+            proof_status="sympy-proved (n ≤ 12); general proof via Binet" if br.get("normalisation_identity") is True else "unproved (not sympy-checked in this run)",
             novelty="classical",
             evidence="exact rational-function identity for each n ≤ 12; integer check for |a| ≤ 4, |b| ≤ 6, n < 14",
             notes="Superseded by the Lehmer identification.",
@@ -444,7 +444,15 @@ def seed_candidates(bridge_report: dict[str, bool] | None = None, census_rows: l
 
 def run_discovery(path: Path | None = None, bridge_report: dict[str, bool] | None = None,
                   grid: dict[str, object] | None = None) -> tuple[Ledger, list[dict[str, Any]], list[dict[str, Any]]]:
-    """Census + prime-density scan + ledger update.  Returns ``(ledger, census, density)``."""
+    """Census + prime-density scan + ledger update.  Returns ``(ledger, census, density)``.
+
+    When no ``bridge_report`` is supplied the symbolic checks are run here, so the ledger never
+    records a "proved" status that was not actually verified in this run.
+    """
+    if bridge_report is None:
+        from core_math.symbolic_bridge import bridge_report as _bridge_report
+
+        bridge_report = _bridge_report(8)
     cen = census(grid)
     density = prime_density_scan(grid)
     ledger = Ledger.load(path)

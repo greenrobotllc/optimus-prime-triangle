@@ -14,6 +14,8 @@ def build_dataset(p_min: int = 5, p_max: int = 2500, use_arithmetic: bool = True
     against Lucas–Lehmer.  The features never see the label.
     """
     ps = prime_exponents(p_min, p_max)
+    if not ps:
+        raise ValueError(f"no prime exponents in [{p_min}, {p_max}]")
     X = feature_matrix(ps, use_arithmetic)
     y = np.array([int(is_known_mersenne_exponent(p)) for p in ps], dtype=np.int64)
     return X, y, ps

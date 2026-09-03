@@ -166,8 +166,8 @@ def verify_operator_gives_lucas_numbers(n: int) -> bool:
 
 def verify_operator_golden(n: int) -> bool:
     """``c = φ − 1`` and ``n = 2^l`` with ``l`` even: the operator yields ``−φ``."""
-    l = int(round(math.log2(n)))
-    if 2 ** l != n or l % 2:
+    lg = int(round(math.log2(n)))
+    if 2 ** lg != n or lg % 2:
         raise ValueError("stated for n = 2^l with l even")
     return is_zero(directional_operator(n, PHI_S - 1) + PHI_S)
 
@@ -250,11 +250,15 @@ def bridge_report(n_max: int = 12) -> dict[str, bool]:
         "rotation_form": all(verify_trig_form(n) for n in range(1, min(n_max, 8) + 1)),
     }
     roots = ring_parameter_roots()
-    report["ring_roots"] = (
-        roots[2] == [0]
-        and roots[3] == [-1]
-        and all(is_zero(r - e) for r, e in zip(roots[4], [-sp.sqrt(2), sp.sqrt(2)]))
-        and all(is_zero(r - e) for r, e in zip(roots[5], [-PHI_S, PHI_S - 1]))
-        and all(is_zero(r - e) for r, e in zip(roots[6], [-sp.sqrt(3), 0, sp.sqrt(3)]))
+    expected: dict[int, list[sp.Expr]] = {
+        2: [sp.Integer(0)],
+        3: [sp.Integer(-1)],
+        4: [-sp.sqrt(2), sp.sqrt(2)],
+        5: [-PHI_S, PHI_S - 1],
+        6: [-sp.sqrt(3), sp.Integer(0), sp.sqrt(3)],
+    }
+    report["ring_roots"] = all(
+        len(roots[n]) == len(exp) and all(is_zero(r - e) for r, e in zip(roots[n], exp, strict=True))
+        for n, exp in expected.items()
     )
     return report

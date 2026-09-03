@@ -105,9 +105,9 @@ class LogisticSiever:
 
     def coefficients(self, names: list[str]) -> list[tuple[str, float]]:
         support = self.pipe["var"].get_support()
-        kept = [n for n, s in zip(names, support) if s]
+        kept = [n for n, s in zip(names, support, strict=True) if s]
         coefs = self.pipe["clf"].coef_[0]
-        return sorted(zip(kept, coefs), key=lambda t: -abs(t[1]))
+        return sorted(zip(kept, coefs, strict=True), key=lambda t: -abs(t[1]))
 
 
 class TorchMLPSiever:
@@ -231,6 +231,9 @@ def honesty_line(report: dict[str, dict[str, tuple[float, float]]], model: str =
     b_mean, b_sd = report[baseline][metric]
     lift = m_mean - b_mean
     sd = math.sqrt(m_sd**2 + b_sd**2)
+    if sd == 0.0:
+        return (f"Lift of '{model}' over the Wagstaff prior on {metric} is {lift:+.3f}; "
+                "no spread estimate is available (a single CV repeat), so no claim is made.")
     if lift < sd:
         return (f"Lift of '{model}' over the Wagstaff prior on {metric} is {lift:+.3f} (< 1 SD = {sd:.3f}): "
                 "no evidence of a geometric signal beyond the number-theoretic prior.")

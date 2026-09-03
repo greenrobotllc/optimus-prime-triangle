@@ -50,7 +50,7 @@ def build_star_figure(star: StarGeometry, points: list[ExponentPoint], plausibil
 
     # the star (interpretation — see core_math.geometry)
     V = star.vertices
-    labels = star.vertex_labels or [f"L={int(l)}" for l in star.vertex_levels]
+    labels = star.vertex_labels or [f"L={int(lvl)}" for lvl in star.vertex_levels]
     paper = star.layout == "paper_parameter_plane"
     fig.add_trace(go.Scatter3d(
         name="star_vertices", x=V[:, 0], y=V[:, 1], z=V[:, 2], mode="markers+text",
@@ -85,7 +85,7 @@ def build_star_figure(star: StarGeometry, points: list[ExponentPoint], plausibil
         b, theta, period = cfg.GOLDEN_RINGS[name]
         fig.add_trace(go.Scatter3d(name=f"golden_ring_{name}", x=x, y=y, z=z, mode="lines+markers",
                                    marker=dict(size=2, color=GOLD), line=dict(width=1, color=GOLD, dash="dot"), opacity=0.6,
-                                   hovertemplate=f"golden ring b = {name}, θ = {theta}°, period {period}<extra></extra>"))
+                                   hovertemplate=f"golden ring {name}: b = {b:.4f}, θ = {theta}°, period {period}<extra></extra>"))
 
     # golden triangles, intersections and spiral
     if star.golden_triangles is not None:
@@ -98,8 +98,8 @@ def build_star_figure(star: StarGeometry, points: list[ExponentPoint], plausibil
         fig.add_trace(go.Scatter3d(name="golden_triangles", x=xs, y=ys, z=zs, mode="lines",
                                    line=dict(color=GOLD, width=5), hovertemplate="golden triangle 36°–72°–72°<extra></extra>"))
     if star.intersections is not None:
-        I = star.intersections
-        fig.add_trace(go.Scatter3d(name="pentagram_intersections", x=I[:, 0], y=I[:, 1], z=I[:, 2], mode="markers",
+        inter = star.intersections
+        fig.add_trace(go.Scatter3d(name="pentagram_intersections", x=inter[:, 0], y=inter[:, 1], z=inter[:, 2], mode="markers",
                                    marker=dict(size=6, color=GOLD, symbol="diamond"),
                                    hovertemplate="golden-triangle intersection (radius R/φ²)<extra></extra>"))
     if star.spiral is not None:
@@ -131,7 +131,7 @@ def build_star_figure(star: StarGeometry, points: list[ExponentPoint], plausibil
 
     fig.update_layout(
         template="plotly_dark",
-        title=title or ((f"Mersenne Star of Ibrahim (2025) in the QPS parameter plane (ζ, ξ), with the golden decorations of "
+        title=title or (("Mersenne Star of Ibrahim (2025) in the QPS parameter plane (ζ, ξ), with the golden decorations of "
                          "the brief on a lower plane — candidates coloured by siever plausibility")
                         if paper else
                         (f"Mersenne Star (interpretation, layout '{star.layout}') — Ψ rotation rings, golden triangles, "
