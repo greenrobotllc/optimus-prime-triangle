@@ -377,5 +377,66 @@
   "F_2^p_is_zero": true,
   "alpha_is_2^p": true,
   "seconds": 46.6
+ },
+ {
+  "p": 132049,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   7,
+   13,
+   17,
+   19,
+   29,
+   37,
+   43,
+   73,
+   97,
+   109,
+   113,
+   127
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 1172.4
+ },
+ {
+  "p": 216091,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 200.1
+ },
+ {
+  "p": 756839,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 2772.2
+ },
+ {
+  "p": 859433,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5,
+   17,
+   29,
+   43,
+   113,
+   127
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [
+   5
+  ],
+  "seconds": 31778.8
  }
 ]
