@@ -183,10 +183,10 @@ def build_bridge(gammas: np.ndarray, u_max: float = 4.5, u_points: int = 2600, n
     flank = np.array([-6e-4, -2e-4, -6e-5, -2e-5, 0.0, 2e-5, 6e-5, 2e-4, 6e-4])
     u = np.unique(np.concatenate([uniform] + [u0 + flank for u0 in spikes]))
     F = zero_diffraction(gammas, u) / (T / (2 * math.pi))          # Landau-normalised: spikes at −Λ(n)/√n
-    zeta_rows = zeta_peak_table(gammas)
+    zeta_rows = zeta_peak_table(gammas, n_max=min(60, int(math.exp(u_max))))   # only lines inside the displayed domain
     x = fibonacci_chain(n_tiles)
     k = np.linspace(0.0, k_max, k_points)
-    background = chain_diffraction(x, k) / len(x) ** 2          # same normalisation as the Bragg amplitudes
+    background = chain_diffraction(x, k) / len(x)               # chain_diffraction is |Σ|²/N; this makes it |Σ|²/N² like amplitude2
     bragg = [b for b in bragg_intensities(x, k_max=k_max) if b.amplitude2 >= 2e-4]
     return {
         "n_zeros": int(len(gammas)), "T": T,

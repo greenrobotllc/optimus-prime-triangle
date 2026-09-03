@@ -438,5 +438,14 @@
    5
   ],
   "seconds": 31778.8
+ },
+ {
+  "p": 1257787,
+  "p_mod_4": 3,
+  "F_2^(p-1)_is_zero": false,
+  "L_2^(p-1)_is_zero": true,
+  "F_2^p_is_zero": true,
+  "alpha_is_2^p": true,
+  "seconds": 8054.5
  }
 ]

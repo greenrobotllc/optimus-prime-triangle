@@ -9,6 +9,7 @@ every known Mersenne prime up to ``--p-max``, using GMP (gmpy2) with the shift-a
 reduction, and appends one JSON record per exponent as it finishes.
 
 Cost: one Fibonacci fast-doubling evaluation is ``p`` doublings of ``p``-bit numbers.
+Requires ``gmpy2`` (declared in requirements.txt); without it the pure-int fallback is far slower.
 
     python research/rank_census.py --p-max 1398269 --out discoveries/rank_of_apparition_census.json
 """
@@ -16,7 +17,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -96,6 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     records: list[dict] = json.loads(args.out.read_text()) if args.out.exists() else []
     done = {r["p"] for r in records}
+    failed: list[int] = []
     for p in KNOWN_MERSENNE_EXPONENTS:
         if p < args.p_min or p > args.p_max or p in done:
             continue
@@ -104,14 +108,32 @@ def main(argv: list[str] | None = None) -> int:
             rec = census_record(p)
         except Exception as exc:  # pragma: no cover
             print(f"ERROR p={p}: {exc!r}", flush=True)
+            failed.append(p)
             continue
         records.append(rec)
         records.sort(key=lambda r: r["p"])
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(json.dumps(records, indent=1))
+        write_records_atomically(args.out, records)
         print(f"DONE p={p} {json.dumps({k: v for k, v in rec.items() if k != 'p'})}", flush=True)
+    if failed:
+        print(f"CENSUS INCOMPLETE: failed exponents {failed}", flush=True)
+        return 1
     print("CENSUS COMPLETE", flush=True)
     return 0
+
+
+def write_records_atomically(path: Path, records: list[dict]) -> None:
+    """Write the JSON to a temporary file in the same directory, then replace, so an
+    interrupted run never leaves a truncated ledger behind."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(prefix=path.name + ".", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w") as fh:
+            json.dump(records, fh, indent=1)
+        os.replace(tmp, path)
+    except BaseException:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        raise
 
 
 if __name__ == "__main__":

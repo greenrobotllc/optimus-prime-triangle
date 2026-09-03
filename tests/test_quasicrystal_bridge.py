@@ -79,3 +79,21 @@ def test_page_generator_embeds_data(tmp_path, gammas):
     text = out.read_text(encoding="utf-8")
     assert "<title>Diffraction of the Zeta Zeros</title>" in text and "zeta-chart" in text and "fib-chart" in text
     assert '"zeta_peaks"' in text and "__DATA__" not in text
+
+
+def test_build_bridge_respects_u_max_and_background_normalisation(gammas):
+    data = qb.build_bridge(gammas[:1500], u_max=1.5, u_points=100, n_tiles=400, k_points=300)
+    assert all(math.log(r["n"]) <= 1.5 for r in data["zeta_peaks"])           # only lines inside the domain
+    # the grid background is |Σ|²/N² on the same scale as amplitude2: exactly 1 at k = 0, and for a model set
+    # the off-peak intensity is bounded, so the median sits far below 1/N
+    assert data["background"][0] == 1.0 and 1e-7 < float(np.median(data["background"])) < 1e-2
+
+
+def test_census_atomic_write(tmp_path):
+    from research.rank_census import write_records_atomically
+
+    out = tmp_path / "c.json"
+    write_records_atomically(out, [{"p": 7}])
+    write_records_atomically(out, [{"p": 7}, {"p": 13}])
+    assert [r["p"] for r in __import__("json").loads(out.read_text())] == [7, 13]
+    assert list(tmp_path.iterdir()) == [out]                                    # no temp files left behind

@@ -100,7 +100,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--zeta);outline-offse
     <figure>
       <div class="legend"><span style="--sw:var(--gold)">Bragg peaks, sampled exactly on the module</span><span style="--sw:var(--muted)">uniform grid between peaks (noise floor)</span></div>
       <div class="chart-wrap" id="fib-wrap"><svg id="fib-chart" viewBox="0 0 960 400" role="img" aria-label="Diffraction of the Fibonacci chain: Bragg peaks on the golden module"></svg><div class="tip" id="fib-tip"></div></div>
-      <figcaption>Log scale. Stems mark the exact positions 2π(m + nφ)/√5 with their measured intensity per point; the faint trace is a uniform grid of k values, which misses every peak because the peaks are narrower than any grid. Labels give (m, n).</figcaption>
+      <figcaption>Log scale. Stems mark the exact positions 2π(m + nφ)/√5 with their measured intensity per point; the faint trace is a uniform grid of k values, which misses every peak because the peaks are narrower than any grid, and stays near 10⁻⁵ because a model set has almost no diffuse background. Labels give (m, n).</figcaption>
     </figure>
     <div class="table-wrap"><table id="fib-table"><thead><tr><th>(m, n)</th><th>k</th><th>intensity per point</th><th>|m + nφ̄|</th></tr></thead><tbody></tbody></table></div>
   </section>
@@ -186,16 +186,16 @@ document.getElementById("s-err").textContent = fmt(100 * Math.max(...DATA.zeta_p
 (function(){
   const svg = document.getElementById("fib-chart"), tip = document.getElementById("fib-tip");
   const W = 960, H = 400, L = 54, R = 16, T = 18, B = 44;
-  const xmin = 0, xmax = 12, ymin = -4.2, ymax = 0.15;    // log10 scale
+  const xmin = 0, xmax = 12, ymin = -6.2, ymax = 0.15;    // log10 scale
   const sx = k => L + (k - xmin) / (xmax - xmin) * (W - L - R);
   const sy = v => T + (ymax - v) / (ymax - ymin) * (H - T - B);
   const ink = "var(--ink)", muted = "var(--muted)", grid = "var(--grid)";
-  for (let e = -4; e <= 0; e++){ const y = sy(e); svg.appendChild(el("line", {x1: L, x2: W - R, y1: y, y2: y, stroke: grid})); svg.appendChild(el("text", {x: L - 8, y: y + 4, "text-anchor": "end", fill: muted}, e === 0 ? "1" : "10^" + e)); }
+  for (let e = -6; e <= 0; e++){ const y = sy(e); svg.appendChild(el("line", {x1: L, x2: W - R, y1: y, y2: y, stroke: grid})); svg.appendChild(el("text", {x: L - 8, y: y + 4, "text-anchor": "end", fill: muted}, e === 0 ? "1" : "10^" + e)); }
   for (let k = 0; k <= 12.001; k += 2){ const x = sx(k); svg.appendChild(el("line", {x1: x, x2: x, y1: sy(ymax), y2: sy(ymin), stroke: grid})); svg.appendChild(el("text", {x, y: H - B + 18, "text-anchor": "middle", fill: muted}, String(k))); }
   svg.appendChild(el("text", {x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle", fill: muted}, "wavenumber k"));
   svg.appendChild(el("text", {x: 14, y: T + 10, fill: muted}, "intensity / N²"));
   let d = "";
-  for (let i = 0; i < DATA.k.length; i++){ const v = Math.log10(Math.max(DATA.background[i], 1e-6)); d += (i ? "L" : "M") + sx(DATA.k[i]).toFixed(1) + " " + sy(Math.max(v, ymin)).toFixed(1); }
+  for (let i = 0; i < DATA.k.length; i++){ const v = Math.log10(Math.max(DATA.background[i], 1e-7)); d += (i ? "L" : "M") + sx(DATA.k[i]).toFixed(1) + " " + sy(Math.max(v, ymin)).toFixed(1); }
   svg.appendChild(el("path", {d, fill: "none", stroke: muted, "stroke-width": 1, opacity: 0.55}));
   const stems = [];
   for (const b of DATA.bragg_peaks){
