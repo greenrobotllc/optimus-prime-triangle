@@ -5,3 +5,4 @@ __pycache__/
 .pytest_cache/
 *.pt
 .DS_Store
+out.json
