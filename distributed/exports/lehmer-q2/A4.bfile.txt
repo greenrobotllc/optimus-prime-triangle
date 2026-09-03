@@ -1,0 +1,2 @@
+# A4 b-file, k = 1..0, generated 2026-09-03; verified_through = 0
+# status per term in evidence.json (proven = PARI isprime / deterministic; prp = BPSW + strong PRP tests)
