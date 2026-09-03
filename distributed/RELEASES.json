@@ -2,7 +2,7 @@
  "accepted": [
   {
    "version": "0.1.0",
-   "worker_sha256": "4db2089839e8626c1178d288ba15b6cb89d8544e5b931cdef93544a73524d619",
+   "worker_sha256": "d550c3469f3231f4e6932fa933daf7d3be16fe4d77e8c151b711b40923526425",
    "git_tag": "",
    "note": "signed tag oeis-home-v0.1.0 to be created on the merge commit; until then the tag field is empty"
   }

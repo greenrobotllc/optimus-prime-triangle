@@ -1,4 +1,4 @@
-# A1 b-file, n = 0..6000, generated 2026-09-03 by oeis_home 0.1.0 (family sha256:df19f28e18efc63c5c520b6927c908c1e3baa32f531daf8342d08a1dac0e3cef, tree 691bc92c321f)
+# A1 b-file, n = 0..6000, generated 2026-09-03 by oeis_home 0.1.0 (family sha256:df19f28e18efc63c5c520b6927c908c1e3baa32f531daf8342d08a1dac0e3cef, tree b424e529f97b)
 # a(n) = Psi(2,-1,n): Psi(0)=2, Psi(1)=1, Psi(n+1) = 5^(n mod 2)*Psi(n) - 2*Psi(n-1)
 # (PARI) a(n) = if(n==0, 2, my(p=2, q=1); for(k=1, n-1, [p, q] = [q, if(k%2, 5, 1)*q - 2*p]); q)
 0 2
