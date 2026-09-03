@@ -122,7 +122,7 @@ uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requi
 | `ml_models/` | leak-free features, labelled dataset, baselines + logistic + torch MLP, repeated stratified CV with an explicit honesty line |
 | `research/` | growth laws (G1), Monte-Carlo tests of the geometric claims (G1b), New Mersenne Conjecture / Wieferich / Wall–Sun–Sun dashboards (G2–G4), the Fibonacci rank-of-apparition theorem (G4b), the periodicity classification (G7), the discovery census and ledger (G8), text-only Lean export |
 | `visualization/plotter.py` | Plotly `graph_objects` 3-D map with stable trace names; matplotlib period-20 wheel |
-| `tests/` | 132 exact tests; every identity quoted from the papers is checked with integer arithmetic |
+| `tests/` | 136 exact tests; every identity quoted from the papers is checked with integer arithmetic |
 
 ## What the math actually says
 
