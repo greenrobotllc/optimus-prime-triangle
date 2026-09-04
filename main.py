@@ -36,6 +36,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--cv-repeats", type=_positive_int, default=cfg.CV_REPEATS, help="stratified CV repeats (>= 1)")
     ap.add_argument("--no-plot", action="store_true")
     ap.add_argument("--research", action="store_true", help="run the research dashboards and update the ledger")
+    ap.add_argument("--bridge", action="store_true", help="build the zeta-zeros diffraction page (downloads Odlyzko's zeros1 table once)")
     ap.add_argument("--out", type=Path, default=cfg.OUTPUT_DIR)
     ap.add_argument("--seed", type=int, default=cfg.SEED)
     ap.add_argument("--layout", choices=cfg.STAR_LAYOUTS, default=cfg.STAR_LAYOUT)
@@ -189,6 +190,19 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         print(md)
         print(f"wrote {md_path}, {lean_path} and updated {cfg.LEDGER_PATH}")
         results["research"] = res
+
+    if args.bridge:
+        banner("9. zeta-zeros diffraction bridge")
+        from research.quasicrystal_bridge import build_bridge, load_odlyzko_zeros
+        from visualization.zeta_page import write_page
+
+        gammas = load_odlyzko_zeros(out / "odlyzko_zeros1.txt")
+        bridge = build_bridge(gammas)
+        page = write_page(bridge, out / "zeta_diffraction.html")
+        worst = max(r["rel_err"] for r in bridge["zeta_peaks"])
+        print(f"{bridge['n_zeros']} zeros, T = {bridge['T']:.1f}; {len(bridge['zeta_peaks'])} prime-power lines checked, worst relative error {100 * worst:.2f}%")
+        print(f"wrote {page}")
+        results["bridge"] = bridge
 
     print(f"\ntotal time: {time.perf_counter() - t0:.1f}s")
     return results

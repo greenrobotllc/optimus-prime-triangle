@@ -6,3 +6,4 @@ torch>=2.13
 scikit-learn>=1.5
 matplotlib>=3.9
 pytest>=8
+gmpy2>=2.2
