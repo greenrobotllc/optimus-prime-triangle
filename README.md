@@ -122,7 +122,7 @@ uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requi
 | `ml_models/` | leak-free features, labelled dataset, baselines + logistic + torch MLP, repeated stratified CV with an explicit honesty line |
 | `research/` | growth laws (G1), Monte-Carlo tests of the geometric claims (G1b), New Mersenne Conjecture / Wieferich / Wall–Sun–Sun dashboards (G2–G4), the Fibonacci rank-of-apparition theorem (G4b), the periodicity classification (G7), the discovery census and ledger (G8), text-only Lean export |
 | `visualization/plotter.py` | Plotly `graph_objects` 3-D map with stable trace names; matplotlib period-20 wheel |
-| `tests/` | 136 exact tests; every identity quoted from the papers is checked with integer arithmetic |
+| `tests/` | 172 exact tests; every identity quoted from the papers is checked with integer arithmetic |
 
 ## What the math actually says
 
@@ -246,6 +246,24 @@ companion sequence, its "Eight Levels" and periodic rings are Chebyshev rotation
 statement in the three papers is the Lucas–Lehmer test.  The working label `config.DISCOVERY_LABEL`
 ("Triboletti–Fable") is attached only to the four QPS identities, the errata, the OEIS candidates and the
 Q = 2 conjecture, and only as a *working name*: mathematical names stick through publication and citation.
+
+## The bridge to Dyson's quasicrystal picture (a demonstration, not a result)
+
+`research/quasicrystal_bridge.py` builds two diffraction patterns from real data and checks each
+against its theory.  For the first 100 000 zeta zeros, `F(u) = Σ cos(γu)` shows a spike of depth
+`−(T/2π)·Λ(n)/√n` at every `u = log n` with `n` a prime power, reproduced to better than 0.2 % for all
+prime powers up to 60: Landau's 1911 theorem, the explicit formula seen as diffraction.  The Fibonacci
+chain with tiles `(φ, 1)` has Bragg peaks exactly at `k = 2π(m + nφ)/√5`, brightest at the Fibonacci
+index pairs.  Both are aperiodic sets with discrete spectrum, which is Dyson's observation; but the zeros
+are not uniformly discrete (their density grows like `log T`), so they fall outside the class of
+one-dimensional Fourier quasicrystals that Kurasov–Sarnak constructed and that was later shown to be
+complete.  That is precisely where the route to the Riemann Hypothesis stops, and the page
+`output/zeta_diffraction.html` shows it.
+
+`research/rank_census.py` is the companion large-scale computation: with GMP it tests, for every known
+Mersenne prime up to `p = 1 398 269`, which small primes divide the Fibonacci rank-of-apparition cofactor
+(no factorisation needed: `q | c` iff `M_p | F_{(M_p−1)/q}`).  Results accumulate in
+`discoveries/rank_of_apparition_census.json`.
 
 ## OEIS@home pilot (`distributed/`)
 
