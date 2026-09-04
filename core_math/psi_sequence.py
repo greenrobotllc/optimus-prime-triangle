@@ -447,6 +447,37 @@ def psi_pow2_mod(a: int, b: int, k: int, m: int) -> int:
     return x
 
 
+def psi_fast(a: int, b: int, n: int):
+    """Exact ``Ψ(a, b, n)`` in ``O(log n)`` big-integer multiplications (gmpy2 when available).
+
+    Uses the two-step matrix of :func:`psi_mod` without a modulus:
+    ``(Ψ(k+2), Ψ(k+1)) = M · (Ψ(k), Ψ(k−1))`` for even ``k`` with
+    ``M = [[a − b, −a(2a − b)], [1, −a]]``, started from ``(Ψ(2), Ψ(1)) = (−b, 1)``.
+    """
+    try:
+        from gmpy2 import mpz
+    except ImportError:  # pragma: no cover
+        mpz = int  # type: ignore[assignment]
+    if n < 0:
+        n = -n
+    if n == 0:
+        return 2
+    if n == 1:
+        return 1
+    t = 2 * a - b
+    m00, m01, m10, m11 = mpz(a - b), mpz(-a * t), mpz(1), mpz(-a)
+    r00, r01, r10, r11 = mpz(1), mpz(0), mpz(0), mpz(1)
+    j = (n - 2) // 2 if n % 2 == 0 else (n - 1) // 2
+    while j:
+        if j & 1:
+            r00, r01, r10, r11 = r00 * m00 + r01 * m10, r00 * m01 + r01 * m11, r10 * m00 + r11 * m10, r10 * m01 + r11 * m11
+        m00, m01, m10, m11 = m00 * m00 + m01 * m10, m00 * m01 + m01 * m11, m10 * m00 + m11 * m10, m10 * m01 + m11 * m11
+        j >>= 1
+    x2, x1 = mpz(-b), mpz(1)
+    top, bottom = r00 * x2 + r01 * x1, r10 * x2 + r11 * x1
+    return int(top if n % 2 == 0 else bottom)
+
+
 # --------------------------------------------------------------------------- periodic rings
 def _ring_table(a: Number, b: Number, period: int) -> tuple[Number, ...]:
     vals = []
