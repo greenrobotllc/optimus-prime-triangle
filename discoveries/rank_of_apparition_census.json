@@ -447,5 +447,17 @@
   "F_2^p_is_zero": true,
   "alpha_is_2^p": true,
   "seconds": 8054.5
+ },
+ {
+  "p": 1398269,
+  "p_mod_4": 1,
+  "q_dividing_N": [
+   3,
+   5
+  ],
+  "F_N_is_zero": true,
+  "F_N/2_is_zero": false,
+  "q_dividing_cofactor": [],
+  "seconds": 36180.3
  }
 ]

@@ -262,8 +262,9 @@ complete.  That is precisely where the route to the Riemann Hypothesis stops, an
 
 `research/rank_census.py` is the companion large-scale computation: with GMP it tests, for every known
 Mersenne prime up to `p = 1 398 269`, which small primes divide the Fibonacci rank-of-apparition cofactor
-(no factorisation needed: `q | c` iff `M_p | F_{(M_p−1)/q}`).  Results accumulate in
-`discoveries/rank_of_apparition_census.json`.
+(no factorisation needed: `q | c` iff `M_p | F_{(M_p−1)/q}`).  The run is complete for every known exponent up to p = 1 398 269 (33 exponents): the theorem held in all 14
+cases with p ≡ 3 (mod 4) up to 1 257 787; for the 19 exponents with p ≡ 1 (mod 4), 3 divides the cofactor 7 times,
+5 twice and 113 once (p = 19 937). Results are in `discoveries/rank_of_apparition_census.json`.
 
 ## Research action items
 
